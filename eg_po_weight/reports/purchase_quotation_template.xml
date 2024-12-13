@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <template id="purchase_quotation_template_for_po_weight"
+                  inherit_id="purchase.report_purchasequotation_document">
+            <xpath expr="//table[hasclass('table-sm')]/thead/tr/th[3]" position="after">
+                <th class="text-right">
+                    <strong>Weight</strong>
+                </th>
+            </xpath>
+            <xpath expr="//tbody/t/tr/t/td[3]" position="after">
+                <td class="text-right">
+                    <span t-field="order_line.product_weight"/>
+                </td>
+            </xpath>
+        </template>
+    </data>
+</odoo>
