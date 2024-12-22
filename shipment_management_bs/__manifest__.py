@@ -2,8 +2,9 @@
 {
     'name': 'Purchase Order Shipment',
     'summary': "Create Shipments of Purchase Order and align stock transfer as per shipments",
-    'author': "Brain Station 23 LTD",
-    'website': "https://www.brainstation-23.com",
+    'author': "PT Industrial Multi Fan",
+    'maintainer': "aRai",
+    'website': "https://kipascke.co.id",
 
     'license': 'OPL-1',
     'category': 'Purchase',
