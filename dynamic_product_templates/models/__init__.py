@@ -1,0 +1,1 @@
+from . import product_dynamic_template

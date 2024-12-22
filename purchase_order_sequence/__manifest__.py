@@ -1,0 +1,15 @@
+{
+    'name': 'Custom Purchase Order Sequence',
+    'version': '1.0',
+    'summary': 'Generate custom sequence for Purchase Orders.',
+    'author': 'PT Industrial Multi Fan',
+    'maintainer': 'aRai',
+    'website': 'https://kipascke.co.id',
+    'maintainer': 'aRai',
+    'category': 'Purchases',
+    'depends': ['purchase'],
+    'data': [],
+    'images':['static/description/logo_cke.jpeg'],
+    'installable': True,
+    'application': False,
+}
