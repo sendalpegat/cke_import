@@ -12,7 +12,7 @@
         'views/stock_picking_view.xml',
     ],
     
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/icon.png'],
     'license': "OPL-1",
     'installable': True,
     'application': True,

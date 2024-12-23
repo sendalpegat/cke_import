@@ -25,11 +25,11 @@
 			'report/purchase_order_report.xml',
 			'views/view_purchase_order.xml',
 			],
+	'images': ['static/description/icon.png'],
 	'demo': [],
 	'installable': True,
 	'auto_install': False,
 	'application': False,
-	 "images":['static/description/Banner.png'],
 }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -14,5 +14,6 @@
         # 'views/menus.xml',
         'views/purchase_order_history_view.xml',
     ],
+    'images': ['static/description/icon.png'],
     'application': True,
 }
