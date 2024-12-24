@@ -12,10 +12,6 @@
     'website': 'https://kipascke.co.id',
     'maintainer': 'aRai',
     'license': 'AGPL-3',
-
-    'price': 20.0,
-    'currency': 'USD',
-
     'depends': ['base', 'product'],
 
     'data': [
@@ -25,9 +21,9 @@
     'demo': [
 
     ],
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/icon.png'],
     'license': 'AGPL-3',
     'installable': True,
     'auto_install': False,
-    'application': False,
+    'application': True,
 }

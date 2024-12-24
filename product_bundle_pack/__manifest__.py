@@ -16,6 +16,7 @@
     "sequence": 1,
     "author": "PT Industrial Multi Fan",
     "maintainer": "aRai",
+    "license": "LGPL-3",
     "website": "https://kipascke.co.id",
     "version": '14.0.0.1',
     "depends": ['sale','product','stock','sale_stock','sale_management','purchase'],

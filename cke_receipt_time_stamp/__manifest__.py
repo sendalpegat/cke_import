@@ -4,6 +4,7 @@
     'description': 'Purchase Order Timeline',
     'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
+    'license': 'LGPL-3',
     'website': 'https://kipascke.co.id',
     'depends': ['purchase', 'stock', 'mail'],
     
@@ -13,7 +14,6 @@
     ],
     
     'images': ['static/description/icon.png'],
-    'license': "OPL-1",
     'installable': True,
     'application': True,
     'auto_install': False,

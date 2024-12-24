@@ -22,7 +22,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['product'],
-    'images': ['static/description/main_screenshot.png', 'static/description/screenshot_1.png'],
+    'images': ['static/description/icon.png'],
 
     # always loaded
     'data': [

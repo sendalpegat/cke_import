@@ -12,6 +12,16 @@
                     <span t-field="order_line.product_weight"/>
                 </td>
             </xpath>
+            <xpath expr="//table[hasclass('table-sm')]/thead/tr/th[3]" position="after">
+                <th class="text-right">
+                    <strong>Volume</strong>
+                </th>
+            </xpath>
+            <xpath expr="//tbody/t/tr/t/td[3]" position="after">
+                <td class="text-right">
+                    <span t-field="order_line.product_volume"/>
+                </td>
+            </xpath>
         </template>
     </data>
 </odoo>

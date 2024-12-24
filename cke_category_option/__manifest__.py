@@ -6,6 +6,7 @@
     'description': 'Allows adding custom options to product categories, which will be applied to associated products.',
     'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
+    'license': 'LGPL-3',
     'website': 'https://kipascke.co.id',
     'depends': ['product'],
     'data': [
@@ -13,5 +14,6 @@
     ],
     'images': ['static/description/icon.png'],
     'installable': True,
-    'application': False,
+    'application': True,
+    'auto_install': False,
 }

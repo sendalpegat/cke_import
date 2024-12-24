@@ -5,7 +5,8 @@
     'summery': 'Total Items Quantity for Delivery Order',
     'website': 'https://kipascke.co.id',
     'author': 'PT Industrial Multi Fan',
-    'maintainer': 'aRau',
+    'maintainer': 'aRai',
+    'license': 'LGPL-3',
     'depends': ['stock'],
     
     'data': [
@@ -14,7 +15,6 @@
     ],
     
     'images': ['static/description/icon.png'],
-    'license': "OPL-1",
     'installable': True,
     'application': True,
     'auto_install': False,
