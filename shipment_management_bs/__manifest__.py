@@ -21,10 +21,11 @@
         'views/purchase_order_shipment.xml',
         'views/stock_picking.xml',
     ],
-    'images': ['/static/description/images/banner.gif'],
+    'images': ['/static/description/icon.png'],
 
     'application': True,
     'installable': True,
+    'auto_install': False,
     'currency': 'USD'
 }
 
