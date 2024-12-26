@@ -9,7 +9,7 @@
     'category': 'Purchases',
     'depends': ['purchase'],
     'data': [],
-    'images':['static/description/logo_cke.jpeg'],
+    'images':['static/description/icon.png'],
     'installable': True,
     'application': True,
     'auto_install': False,
