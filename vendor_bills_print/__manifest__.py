@@ -5,7 +5,6 @@
     'category': 'Accounting',
     'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
-    'website': 'https://kipascke.co.id',
     'license': 'AGPL-3',
     'website': 'https://kipascke.co.id',
     'depends': [
@@ -16,6 +15,7 @@
         'views/account_move_view.xml',
         'report/vendor_bill_report.xml',
     ],
+    'images': ['static/description/icon.png'],
     'installable': True,
     'application': True,
     'auto_install': False,

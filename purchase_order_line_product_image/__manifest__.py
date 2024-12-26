@@ -20,6 +20,7 @@
 	'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
     'website': 'https://kipascke.co.id',
+    'license': 'AGPL-3',
     'depends': ['base', 'purchase'],
 	'data': [
 			'report/purchase_order_report.xml',

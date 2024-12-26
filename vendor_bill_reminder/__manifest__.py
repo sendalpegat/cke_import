@@ -6,12 +6,15 @@
     'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
     'website': 'https://kipascke.co.id',
+    'license': 'AGPL-3',
     'depends': ['purchase', 'account'],
     'data': [
         'data/reminder_cron.xml',
         'data/email_template.xml',
         'views/reminder_view.xml',
     ],
+    'images': ['static/description/icon.png'],
     'installable': True,
-    'application': False,
+    'application': True,
+    'auto_install': False,
 }

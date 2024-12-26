@@ -32,7 +32,7 @@
     'version': '14.0.1.0',
     'depends': ['base','stock','sale_management'],
     'data': ['views/customer_warehouse.xml'],
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/icon.png'],
     'installable': True,
     'application': True,
     'auto_install': False,
