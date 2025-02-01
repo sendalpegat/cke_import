@@ -6,7 +6,7 @@ class ProductCategory(models.Model):
     custom_field_ids = fields.One2many(
         'product.category.custom.field',
         'category_id',
-        string='Custom Fields',
+        string='Product Template',
         help='Fields to be dynamically added to products under this category.'
     )
 
@@ -14,7 +14,7 @@ class ProductCategoryCustomField(models.Model):
     _name = 'product.category.custom.field'
     _description = 'Custom Field for Product Category'
 
-    name = fields.Char(string='Field Name', required=True)
+    name = fields.Char(string='Name', required=True)
     value = fields.Char(string='Value')
     category_id = fields.Many2one('product.category', string='Category', ondelete='cascade')
 
@@ -24,7 +24,7 @@ class ProductTemplate(models.Model):
     custom_field_data = fields.One2many(
         'product.template.custom.field',
         'product_id',
-        string='Custom Fields Data',
+        string='Specification',
         compute='_compute_custom_field_data',
         store=True
     )
@@ -47,6 +47,6 @@ class ProductTemplateCustomField(models.Model):
     _name = 'product.template.custom.field'
     _description = 'Custom Field Data for Product Template'
 
-    field_name = fields.Char(string='Field Name', required=True)
+    field_name = fields.Char(string='Name', required=True)
     value = fields.Char(string='Value')  # Field for storing custom data
     product_id = fields.Many2one('product.template', string='Product', ondelete='cascade')
