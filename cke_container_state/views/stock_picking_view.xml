@@ -1,0 +1,26 @@
+<!-- <odoo>
+    <record id="view_picking_form_inherit_status" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.status</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="object" class="oe_stat_button" icon="fa-check-circle">
+                    <field name="receipt_status" widget="badge"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo> -->
+<odoo>
+    <record id="view_picking_form_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='assigned']" position="after">
+                <field name="shipment_status" widget="statusbar" statusbar_visible="draft,waiting,assigned,done" statusbar_colors='{"cancel": "red"}'/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
