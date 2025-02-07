@@ -1,7 +1,11 @@
 from odoo import models, fields
 
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
+class ResPartnerBank(models.Model):
+    _inherit = "res.partner.bank"
 
-    bank_account_number = fields.Char(string="Bank Account Number", help="Vendor's bank account number")
-    bank_name = fields.Char(string="Bank Name", help="Vendor's bank name")
+    kewarganegaraan = fields.Selection(
+        selection=[('wni', 'WNI'), ('wna', 'WNA')],
+        string="Kewarganegaraan",
+        required=True,
+        default='wni'
+    )

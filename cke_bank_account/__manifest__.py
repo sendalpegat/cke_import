@@ -7,7 +7,7 @@
     'maintainer': 'aRai',
     'license': 'LGPL-3',
     'website': 'https://kipascke.co.id',
-    'depends': ['base'],
+    'depends': ['base', 'account'],
     'data': [
         'views/res_partner_view.xml',
     ],
