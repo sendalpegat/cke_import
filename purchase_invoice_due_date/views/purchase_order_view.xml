@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_approve']" position="after">
                 <field name="invoice_date_due" readonly="1"/>
+                <field name="today_date" readonly="1"/>
+                <field name="total_days" readonly="1"/>
             </xpath>
         </field>
     </record>

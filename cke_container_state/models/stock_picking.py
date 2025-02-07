@@ -1,44 +1,30 @@
-# from odoo import models, fields
-
-# class StockPicking(models.Model):
-#     _inherit = 'stock.picking'
-
-#     receipt_status = fields.Selection([
-#         ('loading', 'Loaded in Container'),
-#         ('kapal', 'Boarded on Vessel'),
-#         ('pelabuhan', 'Arrived at Tj. Priok'),
-#         ('gudang', 'Arrived at IMF WH')
-#     ], string='Receipt Status', default='loading')
-
 from odoo import models, fields
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    shipment_status = fields.Selection([
+    state = fields.Selection([
         ('draft', 'Draft'),
-        ('waiting', 'Waiting'),
-        ('assigned', 'Assigned'),
+        ('assigned', 'Ready'),  # Moved directly after "Draft"
+        ('loaded', 'Loaded in Container'),
+        ('boarded', 'Boarded on Vessel'),
+        ('customs', 'Arrived at Tj Priok'),
+        ('arrived', 'Arrived at IMF WH'),
         ('done', 'Done'),
-        ('cancel', 'Cancelled'),
-    ], string='Shipment Status', default='draft', track_visibility='onchange')
+        ('cancel', 'Cancelled')
+    ], string='Status', default='draft')
 
-    def action_confirm(self):
-        res = super(StockPicking, self).action_confirm()
-        self.write({'shipment_status': 'waiting'})
-        return res
+    def action_assigned(self):
+        self.state = 'assigned'
 
-    def action_assign(self):
-        res = super(StockPicking, self).action_assign()
-        self.write({'shipment_status': 'assigned'})
-        return res
+    def action_loaded(self):
+        self.state = 'loaded'
 
-    def button_validate(self):
-        res = super(StockPicking, self).button_validate()
-        self.write({'shipment_status': 'done'})
-        return res
+    def action_boarded(self):
+        self.state = 'boarded'
 
-    def action_cancel(self):
-        res = super(StockPicking, self).action_cancel()
-        self.write({'shipment_status': 'cancel'})
-        return res
+    def action_customs(self):
+        self.state = 'customs'
+
+    def action_arrived(self):
+        self.state = 'arrived'

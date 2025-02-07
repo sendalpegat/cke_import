@@ -1,25 +1,32 @@
-<!-- <odoo>
-    <record id="view_picking_form_inherit_status" model="ir.ui.view">
-        <field name="name">stock.picking.form.inherit.status</field>
-        <field name="model">stock.picking</field>
-        <field name="inherit_id" ref="stock.view_picking_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
-                <button type="object" class="oe_stat_button" icon="fa-check-circle">
-                    <field name="receipt_status" widget="badge"/>
-                </button>
-            </xpath>
-        </field>
-    </record>
-</odoo> -->
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="view_picking_form_inherit" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='assigned']" position="after">
-                <field name="shipment_status" widget="statusbar" statusbar_visible="draft,waiting,assigned,done" statusbar_colors='{"cancel": "red"}'/>
+            <!-- Ganti statusbar dengan urutan baru -->
+            <field name="state" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft, assigned, loaded, boarded, customs, arrived, done, cancel"/>
+            </field>
+
+            <!-- Tambahkan tombol aksi -->
+            <xpath expr="//form/header" position="inside">
+                <button name="action_assigned" type="object" string="Ready" class="oe_highlight"
+                        attrs="{'invisible': [('state', 'not in', ['draft']), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                <button name="action_loaded" type="object" string="Loading" class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'assigned'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                <button name="action_boarded" type="object" string="Boarding" class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'loaded'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                <button name="action_customs" type="object" string="Clearance" class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'boarded'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                <button name="action_arrived" type="object" string="Arrive WH" class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'customs'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+            </xpath>
+
+            <!-- Validasi hanya muncul di status arrived -->
+            <xpath expr="//form/header/button[@name='button_validate']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', '!=', 'arrived'), ('picking_type_id.code', '!=', 'incoming')]}</attribute>
             </xpath>
         </field>
     </record>

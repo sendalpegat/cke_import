@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Specification">
-                    <group string="Custom Fields">
+                    <group>
                         <field name="custom_field_data">
                             <tree editable="bottom">
                                 <field name="field_name"/>
