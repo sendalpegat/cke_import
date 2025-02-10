@@ -13,20 +13,20 @@
             <!-- Tambahkan tombol aksi -->
             <xpath expr="//form/header" position="inside">
                 <button name="action_assigned" type="object" string="Ready" class="oe_highlight"
-                        attrs="{'invisible': [('state', 'not in', ['draft']), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                        attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
                 <button name="action_loaded" type="object" string="Loading" class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'assigned'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                        attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
                 <button name="action_boarded" type="object" string="Boarding" class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'loaded'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                        attrs="{'invisible': [('state', '!=', 'loaded')]}"/>
                 <button name="action_customs" type="object" string="Clearance" class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'boarded'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                        attrs="{'invisible': [('state', '!=', 'boarded')]}"/>
                 <button name="action_arrived" type="object" string="Arrive WH" class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'customs'), ('picking_type_id.code', '!=', 'incoming')]}"/>
+                        attrs="{'invisible': [('state', '!=', 'customs')]}"/>
             </xpath>
 
             <!-- Validasi hanya muncul di status arrived -->
             <xpath expr="//form/header/button[@name='button_validate']" position="attributes">
-                <attribute name="attrs">{'invisible': [('state', '!=', 'arrived'), ('picking_type_id.code', '!=', 'incoming')]}</attribute>
+                <attribute name="attrs">{'invisible': [('state', '!=', 'arrived')]}</attribute>
             </xpath>
         </field>
     </record>

@@ -13,6 +13,7 @@
         'security/record_rules.xml',
         'views/product_template_views.xml',
         'views/product_category_views.xml',
+        # 'views/product_static_category_views.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,
