@@ -19,6 +19,8 @@ class PurchaseOrderLine(models.Model):
     rest_po_total = fields.Float(string="Total CNY", compute="_compute_rest_po_total", store=True, help="Total value of rest_po multiplied by price_unit.",
     )
 
+    tanggal = fields.Date(string='Today', default=fields.Date.context_today)
+
     @api.depends('price_unit', 'order_id.currency_id', 'rest_po')
     def _compute_hpp(self):
         for line in self:

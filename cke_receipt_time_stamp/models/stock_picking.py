@@ -44,3 +44,5 @@ class StockPicking(models.Model):
             'created_uid': self.env.user.id,
         })
         return res
+
+    

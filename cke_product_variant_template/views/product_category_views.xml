@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_product_category_form_inherit" model="ir.ui.view">
+        <field name="name">product.category.form.inherit</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/> <!-- Pastikan ini benar -->
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after"> <!-- Menggunakan XPath yang lebih umum -->
+                <field name="variant_template_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

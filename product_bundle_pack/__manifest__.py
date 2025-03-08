@@ -23,6 +23,7 @@
     "data": [
         'wizard/product_bundle_wizard_view.xml',
         'views/product_view.xml',
+        # 'views/purchase_view.xml',
         'security/ir.model.access.csv'
     ],
     "installable": True,
