@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_date_input_wizard_form" model="ir.ui.view">
+            <field name="name">date.input.wizard.form</field>
+            <field name="model">date.input.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Input Tanggal">
+                    <group>
+                        <field name="picking_id" invisible="1"/>
+                        <field name="stage" invisible="1"/>
+                        <field name="input_date" string="Pilih Tanggal"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm" string="Simpan" type="object" class="oe_highlight"/>
+                        <button string="Batal" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

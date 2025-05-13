@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="uom_category_group" model="res.groups">
+    <field name="name">UoM Category</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="uom_uom_group" model="res.groups">
+    <field name="name">UoM</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="product_category_group" model="res.groups">
+    <field name="name">Product Category</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="product_packaging_group" model="res.groups">
+    <field name="name">Product Packaging</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="product_attribute_group" model="res.groups">
+    <field name="name">Product Attribute</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="product_brand_group" model="res.groups">
+    <field name="name">Product Brand</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="product_configurator_group" model="res.groups">
+    <field name="name">Product</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="pricelist_configurator_group" model="res.groups">
+    <field name="name">Pricelist</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="vendor_pricelist_configurator_group" model="res.groups">
+    <field name="name">Vendor Pricelist</field>
+    <field name="category_id" ref="product_configurator_module_category" />
+    <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+</record>
+
+<record id="original_product_group" model="res.groups">
+    <field name="name">Show original product</field>
+    <field name="category_id" ref="base.module_category_hidden" />
+</record>
+</odoo>

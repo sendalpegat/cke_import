@@ -11,10 +11,9 @@
     'data': [
         'security/ir.model.access.csv',
         'security/record_rules.xml',
-        # 'views/report_product_template.xml',  # File XML untuk report
         'views/product_template_views.xml',
         'views/product_category_views.xml',
-        # 'views/product_static_category_views.xml',
+        'views/product_product_views.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,

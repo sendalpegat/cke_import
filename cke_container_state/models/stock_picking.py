@@ -1,30 +1,31 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+class StockPickingInherit(models.Model):
+    _inherit = "stock.picking"
 
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('assigned', 'Ready'),  # Moved directly after "Draft"
-        ('loaded', 'Loaded in Container'),
-        ('boarded', 'Boarded on Vessel'),
-        ('customs', 'Arrived at Tj Priok'),
-        ('arrived', 'Arrived at IMF WH'),
-        ('done', 'Done'),
-        ('cancel', 'Cancelled')
-    ], string='Status', default='draft')
+    custom_stage = fields.Selection(
+        selection=[
+            ("loaded", "Loaded in Container"),
+            ("boarded", "Boarded on Vessel"),
+            ("customs", "Arrived at Tj Priok"),
+            ("arrived", "Arrived at IMF WH"),
+            ("done", "Done"),
+        ],
+        string="Receipt Status",
+        default="loaded",
+        tracking=True,
+    )
 
-    def action_assigned(self):
-        self.state = 'assigned'
-
-    def action_loaded(self):
-        self.state = 'loaded'
-
-    def action_boarded(self):
-        self.state = 'boarded'
-
-    def action_customs(self):
-        self.state = 'customs'
-
-    def action_arrived(self):
-        self.state = 'arrived'
+    # Fungsi untuk membuka wizard input tanggal
+    def open_date_wizard(self, stage):
+        return {
+            'name': 'Input Tanggal Status',
+            'type': 'ir.actions.act_window',
+            'res_model': 'date.input.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_picking_id': self.id,
+                'default_stage': stage,
+            }
+        }
