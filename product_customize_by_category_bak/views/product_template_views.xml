@@ -1,0 +1,56 @@
+<!-- views/product_template_views.xml -->
+<odoo>
+    <record id="view_product_template_form_inherit" model="ir.ui.view">
+        <field name="name">product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Custom Fields">
+                    <button name="action_sync_custom_fields" 
+                            string="Sync Custom Fields" 
+                            type="object" 
+                            class="btn-primary mb-2"/>
+                    <notebook>
+                        <page string="Specification">
+                            <field name="custom_field_data" 
+                                   domain="[('field_type', '=', 'spec')]">
+                                <tree editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material">
+                            <field name="custom_field_data" 
+                                   domain="[('field_type', '=', 'material')]">
+                                <tree editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cable">
+                            <field name="custom_field_data" 
+                                   domain="[('field_type', '=', 'cable')]">
+                                <tree editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Color">
+                            <field name="custom_field_data" 
+                                   domain="[('field_type', '=', 'color')]">
+                                <tree editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

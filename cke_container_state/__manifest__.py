@@ -7,9 +7,10 @@
     'maintainer': 'aRai',
     'license': 'LGPL-3',
     'website': 'https://kipascke.co.id',
-    'depends': ['stock'],
+    'depends': ['product_bundle_pack', 'stock'],
     'data': [
         'views/stock_picking_view.xml',
+        'views/date_input_wizard_views.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,

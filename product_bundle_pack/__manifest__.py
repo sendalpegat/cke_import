@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+# Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 
 {
-    "name": "Product Bundle Pack",
-    "category": 'Purchase',
-    "summary": 'Combine two or more product pack product kit product bundle product pack item on product combo product',
+    "name": "Product Bundle Pack in Odoo",
+    "category": 'Sales',
+    "summary": 'Combine two or more product pack product kit product bundle product pack item on product combo product on sale bundle product delivery bundle product pack kit combine product combine product variant bundle item pack sales bundle delivery pack bundle',
     "description": """
+	BrowseInfo developed a new odoo/OpenERP module apps.
 	This module is use to 
     odoo create Product Bundle Product Pack Bundle Pack of Product Combined Product pack odoo
     odoo Product Pack Custom Combo Product Bundle Product Customized product Group product odoo
@@ -14,21 +16,20 @@
 
     """,
     "sequence": 1,
-    "author": "PT Industrial Multi Fan",
-    "maintainer": "aRai",
-    "license": "LGPL-3",
-    "website": "https://kipascke.co.id",
+    "author": "Browseinfo",
+    "website": "https://www.browseinfo.in",
     "version": '14.0.0.1',
     "depends": ['sale','product','stock','sale_stock','sale_management','purchase'],
     "data": [
         'wizard/product_bundle_wizard_view.xml',
         'views/product_view.xml',
-        # 'views/purchase_view.xml',
         'security/ir.model.access.csv'
     ],
+    "price": 35,
+    "currency": 'EUR',
     "installable": True,
     "application": True,
     "auto_install": False,
-     "images":['static/description/icon.png'],
+     "images":['static/description/Banner.png'],
 
 }
