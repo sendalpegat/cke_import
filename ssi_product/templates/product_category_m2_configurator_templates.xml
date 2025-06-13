@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="product_category_m2o_configurator_template">
+        <group name="product_category_1" col="2" colspan="4" string="Product Category">
+            <field name="product_category_selection_method" string="Selection Method" />
+            <field
+                name="product_category_ids"
+                attrs="{'invisible':[('product_category_selection_method','!=','manual')]}"
+            />
+            <field
+                name="product_category_domain"
+                widget="domain"
+                options="{'model': 'product.category', 'in_dialog': True}"
+                attrs="{'invisible':[('product_category_selection_method','!=','domain')]}"
+                string="Domain"
+            />
+            <field
+                name="product_category_python_code"
+                widget="ace"
+                attrs="{'invisible':[('product_category_selection_method','!=','code')]}"
+                string="Python Code"
+            />
+        </group>
+    </template>
+</odoo>

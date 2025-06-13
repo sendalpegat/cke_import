@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="product_product_tree_view" model="ir.ui.view">
+    <field name="name">product.product.tree</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="product.product_product_tree_view" />
+    <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='name']" position="after">
+            <field name="product_brand_id" />
+        </xpath>
+
+    </field>
+</record>
+
+<record id="action_open_single_product_product_brand" model="ir.actions.act_window">
+    <field name="name">Product Brand</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">product.brand</field>
+    <field name="view_mode">kanban,form,tree</field>
+    <field name="domain">[('product_ids.product_variant_ids', 'in', active_id)]</field>
+</record>
+
+<record id="product_kanban_view" model="ir.ui.view">
+    <field name="name">product.product.kanban</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="product.product_kanban_view" />
+    <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='activity_state']" position="after">
+            <field name="product_brand_id" />
+        </xpath>
+        <xpath expr="//div[hasclass('o_kanban_tags_section')]" position="before">
+            <div name="brand" class="mt-1" t-if="record.product_brand_id.value">
+                Brand: <a
+                        type="action"
+                        name="%(action_open_single_product_product_brand)d"
+                    >
+                    <field name="product_brand_id" />
+                </a>
+            </div>
+        </xpath>
+
+    </field>
+</record>
+
+<menuitem
+        id="product_product_menu"
+        name="Product Varians"
+        parent="menu_root_product"
+        action="product.product_normal_action"
+        groups="product_configurator_group"
+        sequence="2"
+    />
+</odoo>

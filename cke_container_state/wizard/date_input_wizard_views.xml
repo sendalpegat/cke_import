@@ -3,6 +3,10 @@
     <data>
         <record id="view_date_input_wizard_form" model="ir.ui.view">
             <field name="name">date.input.wizard.form</field>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
             <field name="model">custom.picking.date.wizard</field>
             <field name="arch" type="xml">
                 <form string="Input Tanggal Status">
@@ -16,10 +20,30 @@
                     <footer>
                         <button name="action_confirm" string="Simpan" type="object" class="btn-primary"/>
                         <button string="Batal" special="cancel" class="btn-secondary"/>
+<<<<<<< HEAD
+=======
+=======
+            <field name="model">date.input.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Input Tanggal">
+                    <group>
+                        <field name="picking_id" invisible="1"/>
+                        <field name="stage" invisible="1"/>
+                        <field name="input_date" string="Pilih Tanggal"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm" string="Simpan" type="object" class="oe_highlight"/>
+                        <button string="Batal" class="oe_link" special="cancel"/>
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
                     </footer>
                 </form>
             </field>
         </record>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
         
         <record id="action_custom_date_wizard" model="ir.actions.act_window">
             <field name="name">Input Tanggal Status</field>
@@ -27,5 +51,10 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
     </data>
 </odoo>

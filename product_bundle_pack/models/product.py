@@ -26,12 +26,17 @@ class ProductTemplate(models.Model):
     cal_pack_price = fields.Boolean(string='Calculate Pack Price')
     pack_ids = fields.One2many('product.pack', 'bi_product_template', string='Product Components')
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
         for rec in records:
             rec._recompute_pack_price()
         return records
+<<<<<<< HEAD
 
     def write(self, vals):
         res = super().write(vals)
@@ -46,6 +51,52 @@ class ProductTemplate(models.Model):
             total = sum(line.qty_uom * line.product_id.standard_price for line in self.pack_ids if line.product_id)
             if total > 0:
                 self.standard_price = total
+=======
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'pack_ids' in vals or 'cal_pack_price' in vals:
+            for rec in self:
+                rec._recompute_pack_price()
+        return res
+
+    def _recompute_pack_price(self):
+        """Update standard_price jika cal_pack_price diaktifkan"""
+        if self.cal_pack_price and self.pack_ids:
+            total = sum(line.qty_uom * line.product_id.standard_price for line in self.pack_ids if line.product_id)
+            if total > 0:
+                self.standard_price = total
+=======
+	@api.model
+	def create(self,vals):
+		total = 0
+		res = super(ProductProduct,self).create(vals)
+		if res.cal_pack_price:
+			if 'pack_ids' in vals or 'cal_pack_price' in vals:
+					for pack_product in res.pack_ids:
+							qty = pack_product.qty_uom
+							price = pack_product.product_id.standard_price
+							total += qty * price
+		if total > 0:
+			res.standard_price = total
+		return res
+
+	def write(self,vals):
+		total = 0
+		res = super(ProductProduct, self).write(vals)
+		for pk in self:
+			if pk.cal_pack_price:
+				if 'pack_ids' in vals or 'cal_pack_price' in vals:
+					for pack_product in pk.pack_ids:
+						qty = pack_product.qty_uom
+						price = pack_product.product_id.standard_price
+						total += qty * price
+
+		if total > 0:
+			self.standard_price = total
+		return res
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
+>>>>>>> 96b28c2cf3b83a317a773c01125a88ce0c9038de
 
 class PurchaseOrder(models.Model):
 	_inherit = 'purchase.order'		
