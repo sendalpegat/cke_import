@@ -7,10 +7,12 @@
         This module allows creating Vendor Bills manually from Inventory Receipts using a button or action.
     """,
     'author': 'Your Name',
-    'depends': ['stock', 'account'],
+    'depends': ['stock', 'account', 'purchase'],
     'data': [
         'views/stock_picking_views.xml',
+        'views/purchase_order_views.xml'
+        # 'views/account_move_views.xml',
     ],
     'installable': True,
-    'application': False,
+    'application': True,
 }

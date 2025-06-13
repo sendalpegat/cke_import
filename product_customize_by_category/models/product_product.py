@@ -109,8 +109,8 @@ class ProductProduct(models.Model):
     )
 
     tou = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')],
-        string='Therm of Use',
+        [('yes', 'Yes - Reset Thermal Protector'), ('no', 'No')],
+        string='Thermofuse',
         default='no'
     )
 

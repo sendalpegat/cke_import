@@ -13,15 +13,31 @@
                         options="{'clickable': '1'}"/>
                 </xpath>
 
+                <!-- Tambahkan field tanggal di bawah status -->
+                <!-- <xpath expr="//div[hasclass('o_statusbar_status')]" position="after">
+                    <div class="row">
+                        <div class="col-12">
+                            <label string="Log Tanggal Status"/>
+                            <div class="row">
+                                <field name="date_loaded" class="col-3" readonly="1"/>
+                                <field name="date_boarded" class="col-3" readonly="1"/>
+                                <field name="date_customs" class="col-3" readonly="1"/>
+                                <field name="date_arrived" class="col-3" readonly="1"/>
+                                <field name="date_done_custom" class="col-3" readonly="1"/>
+                            </div>
+                        </div>
+                    </div>
+                </xpath> -->
+
                 <!-- Tambahkan tombol aksi -->
                 <xpath expr="//header//button[@name='button_validate']" position="before">
-                    <button name="open_date_wizard('loaded')" string="Loaded" type="object" class="oe_highlight" 
+                    <button name="action_loaded" string="Loaded" type="object" class="oe_highlight" 
                         attrs="{'invisible': [('custom_stage', '!=', 'loaded')]}"/>
-                    <button name="open_date_wizard('boarded')" string="Boarded" type="object" class="oe_highlight" 
+                    <button name="action_boarded" string="Boarded" type="object" class="oe_highlight" 
                         attrs="{'invisible': [('custom_stage', '!=', 'boarded')]}"/>
-                    <button name="open_date_wizard('customs')" string="Customs" type="object" class="oe_highlight" 
+                    <button name="action_customs" string="Customs" type="object" class="oe_highlight" 
                         attrs="{'invisible': [('custom_stage', '!=', 'customs')]}"/>
-                    <button name="open_date_wizard('arrived')" string="Arrived" type="object" class="oe_highlight" 
+                    <button name="action_arrived" string="Arrived" type="object" class="oe_highlight" 
                         attrs="{'invisible': [('custom_stage', '!=', 'arrived')]}"/>
                 </xpath>
             </field>

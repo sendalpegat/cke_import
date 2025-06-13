@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
-
 from odoo import api, fields, models, _
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError
@@ -13,6 +10,8 @@ class ProductPack(models.Model):
 	_description = "Product Pack"
 	
 	product_id = fields.Many2one(comodel_name='product.product', string='Product', required=True)
+	default_code = fields.Char(related='product_id.default_code', string="Product Code", store=True)
+	standard_price = fields.Float(related='product_id.standard_price', string="Cost", store=True)
 	qty_uom = fields.Float(string='Quantity', required=True, default=1.0)
 	bi_product_template = fields.Many2one(comodel_name='product.template', string='Product pack')
 	bi_image = fields.Binary(related='product_id.image_1920', string='Image', store=True)
@@ -20,41 +19,33 @@ class ProductPack(models.Model):
 	uom_id = fields.Many2one(related='product_id.uom_id' , string="Unit of Measure", readonly="1")
 	name = fields.Char(related='product_id.name', readonly="1")
 
-class ProductProduct(models.Model):
-	_inherit = 'product.template'
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
 
-	is_pack = fields.Boolean(string='Is Product Pack')
-	cal_pack_price = fields.Boolean(string='Calculate Pack Price')
-	pack_ids = fields.One2many(comodel_name='product.pack', inverse_name='bi_product_template', string='Product pack')
+    is_pack = fields.Boolean(string='Is Product Pack')
+    cal_pack_price = fields.Boolean(string='Calculate Pack Price')
+    pack_ids = fields.One2many('product.pack', 'bi_product_template', string='Product Components')
 
-	@api.model
-	def create(self,vals):
-		total = 0
-		res = super(ProductProduct,self).create(vals)
-		if res.cal_pack_price:
-			if 'pack_ids' in vals or 'cal_pack_price' in vals:
-					for pack_product in res.pack_ids:
-							qty = pack_product.qty_uom
-							price = pack_product.product_id.standard_price
-							total += qty * price
-		if total > 0:
-			res.standard_price = total
-		return res
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        for rec in records:
+            rec._recompute_pack_price()
+        return records
 
-	def write(self,vals):
-		total = 0
-		res = super(ProductProduct, self).write(vals)
-		for pk in self:
-			if pk.cal_pack_price:
-				if 'pack_ids' in vals or 'cal_pack_price' in vals:
-					for pack_product in pk.pack_ids:
-						qty = pack_product.qty_uom
-						price = pack_product.product_id.standard_price
-						total += qty * price
+    def write(self, vals):
+        res = super().write(vals)
+        if 'pack_ids' in vals or 'cal_pack_price' in vals:
+            for rec in self:
+                rec._recompute_pack_price()
+        return res
 
-		if total > 0:
-			self.standard_price = total
-		return res
+    def _recompute_pack_price(self):
+        """Update standard_price jika cal_pack_price diaktifkan"""
+        if self.cal_pack_price and self.pack_ids:
+            total = sum(line.qty_uom * line.product_id.standard_price for line in self.pack_ids if line.product_id)
+            if total > 0:
+                self.standard_price = total
 
 class PurchaseOrder(models.Model):
 	_inherit = 'purchase.order'		

@@ -33,10 +33,6 @@ class ResConfigSettings(models.TransientModel):
     app_account_url = fields.Char('My Odoo.com Account Url')
     app_enterprise_url = fields.Char('Customize Module Url(eg. Enterprise)')
     app_ribbon_name = fields.Char('Show Demo Ribbon')
-
-    # def _app_check_sys_op(self):
-    #     # Implementasi default jika method ini diperlukan
-    #     return True
     
     @api.model
     def get_values(self):

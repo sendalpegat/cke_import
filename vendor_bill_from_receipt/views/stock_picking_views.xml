@@ -6,9 +6,26 @@
         <field name="arch" type="xml">
             <!-- Tambahkan tombol Create Vendor Bill -->
             <xpath expr="//header" position="inside">
-                <button string="Create Vendor Bill" type="object" name="action_create_vendor_bill"
+                <button string="Create Commercial Invoice" type="object" name="action_create_vendor_bill"
                         class="btn-primary" attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}"/>
             </xpath>
         </field>
     </record>
+
+    <!-- New Action untuk Multi Create Vendor Bill -->
+    <record id="action_create_multiple_vendor_bills" model="ir.actions.server">
+        <field name="name">Create Multi CI</field>
+        <field name="model_id" ref="model_stock_picking"/>
+        <field name="binding_model_id" ref="model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.browse(env.context.get('active_ids')).action_create_multiple_vendor_bills()
+        </field>
+    </record>
+
+    <menuitem id="menu_action_create_multiple_vendor_bills"
+              name="Create Single Vendor Bill"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="action_create_multiple_vendor_bills"
+              sequence="10"/>
 </odoo>

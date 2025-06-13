@@ -109,7 +109,7 @@ class ProductTemplate(models.Model):
     )
 
     tou = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')],
+        [('yes', 'Yes - Reset Thermal Protector'), ('no', 'No')],
         string='Therm of Use',
         default='no'
     )

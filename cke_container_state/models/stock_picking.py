@@ -5,23 +5,22 @@ class StockPickingInherit(models.Model):
 
     custom_stage = fields.Selection(
         selection=[
-            ("loaded", "Loaded in Container"),
-            ("boarded", "Boarded on Vessel"),
-            ("customs", "Arrived at Tj Priok"),
-            ("arrived", "Arrived at IMF WH"),
+            ("loaded", "Loaded"),
+            ("boarded", "Boarded"),
+            ("customs", "Customs"),
+            ("arrived", "Arrived"),
             ("done", "Done"),
         ],
-        string="Receipt Status",
+        string="Status Penerimaan",
         default="loaded",
         tracking=True,
     )
 
-    # Fungsi untuk membuka wizard input tanggal
     def open_date_wizard(self, stage):
         return {
-            'name': 'Input Tanggal Status',
+            'name': 'Input Tanggal',
             'type': 'ir.actions.act_window',
-            'res_model': 'date.input.wizard',
+            'res_model': 'custom.picking.date.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {
@@ -29,3 +28,9 @@ class StockPickingInherit(models.Model):
                 'default_stage': stage,
             }
         }
+
+    def button_validate(self):
+        res = super().button_validate()
+        self.message_post(body=f"Status diubah ke <b>Done</b> pada {fields.Datetime.now()}")
+        self.custom_stage = "done"
+        return res
