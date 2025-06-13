@@ -5,10 +5,13 @@
         <field name="model">account.voucher.wizard.purchase</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <form string="Advance Payment">
+            <form string="Pay T.T">
                 <group>
                     <field name="order_id" invisible="1" />
                     <group colspan="4" col="4">
+                        <field name="partner_id" string="Vendor" readonly="1"/>
+                        <field name="child_contact_id"/>
+                        <field name="bank_account_id"/>
                         <field
                             name="journal_id"
                             domain="[('type','in',['bank', 'cash'])]"
@@ -35,7 +38,7 @@
                 <footer>
                     <button
                         name="make_advance_payment"
-                        string="Make advance payment"
+                        string="Make T.T payment"
                         type="object"
                         class="btn-primary"
                     />

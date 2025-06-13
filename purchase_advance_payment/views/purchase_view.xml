@@ -47,6 +47,14 @@
                     options="{'currency_field': 'currency_id'}"
                 />
             </field>
+            <field name="amount_total" position="after">
+                <field name="payment_progress"
+                       widget="badge"
+                       decoration-success="payment_progress == 'full_payment'"
+                       decoration-info="payment_progress == 'balance_payment'"
+                       decoration-warning="payment_progress == 'commercial_invoice'"
+                       decoration-danger="payment_progress == 'down_payment'" />
+            </field>
         </field>
     </record>
 
@@ -84,6 +92,15 @@
                     optional="hide"
                 />
             </field>
+            <field name="partner_id" position="after">
+                <field name="payment_progress"
+                       widget="badge"
+                       decoration-success="payment_progress == 'full_payment'"
+                       decoration-info="payment_progress == 'balance_payment'"
+                       decoration-warning="payment_progress == 'commercial_invoice'"
+                       decoration-danger="payment_progress == 'down_payment'"
+                       optional="hide"/>
+            </field>
         </field>
     </record>
 
@@ -111,6 +128,17 @@
                     optional="hide"
                 />
             </field>
+        </field>
+    </record>
+
+    <record id="view_account_payment_tree_inherit" model="ir.ui.view">
+        <field name="name">account.payment.tree.inherit.purchase.advance</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount']" position="before">
+                <field name="percentage_advance" string="Advance (%)"/>
+            </xpath>
         </field>
     </record>
 

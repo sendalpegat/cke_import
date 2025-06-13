@@ -1,12 +1,22 @@
-# Copyright (C) 2021 ForgeFlow S.L.
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html)
-
 from odoo import api, fields, models
 from odoo.tools import float_compare
 
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
+
+    payment_progress = fields.Selection(
+        selection=[
+            ('not_paid', 'Not Paid'),
+            ('down_payment', 'Down Payment'),
+            ('commercial_invoice', 'Commercial Invoice'),
+            ('balance_payment', 'Balance Payment'),
+            ('full_payment', 'Full Payment'),
+        ],
+        string='Payment Progress',
+        compute='_compute_payment_progress',
+        store=True,
+    )
 
     account_payment_ids = fields.One2many(
         "account.payment", "purchase_id", string="Pay purchase advanced", readonly=True
@@ -113,3 +123,29 @@ class PurchaseOrder(models.Model):
     def _compute_advance_payment_count(self):
         for order in self:
             order.advance_payment_count = len(order.account_payment_ids)
+
+    @api.depends('account_payment_ids', 'invoice_ids.state', 'invoice_ids.move_type',
+                 'invoice_ids.amount_residual', 'amount_total')
+    def _compute_payment_progress(self):
+        for order in self:
+            payment_progress = 'not_paid'
+
+            has_advance = bool(order.account_payment_ids)
+            commercial_invoice_exist = any(
+                inv.move_type == 'in_invoice' and inv.state == 'commercial_invoice'
+                for inv in order.invoice_ids
+            )
+
+            total_residual = sum(inv.amount_residual for inv in order.invoice_ids if inv.move_type == 'in_invoice')
+            has_balance = total_residual > 0
+
+            if has_advance and not order.invoice_ids:
+                payment_progress = 'down_payment'
+            elif commercial_invoice_exist:
+                payment_progress = 'commercial_invoice'
+            elif has_balance:
+                payment_progress = 'balance_payment'
+            elif not has_balance and order.invoice_ids:
+                payment_progress = 'full_payment'
+
+            order.payment_progress = payment_progress

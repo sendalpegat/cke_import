@@ -1,8 +1,4 @@
-# Copyright (C) 2021 ForgeFlow S.L.
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html)
-
 from odoo import fields, models
-
 
 class AccountPayment(models.Model):
 
@@ -14,3 +10,7 @@ class AccountPayment(models.Model):
         readonly=True,
         states={"draft": [("readonly", False)]},
     )
+
+    percentage_advance = fields.Float("Advance Percentage", readonly=True)
+
+    invoice_id = fields.Many2one('account.move', string="Vendor Bill", readonly=True)

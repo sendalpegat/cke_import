@@ -43,6 +43,23 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     )
     payment_ref = fields.Char("Ref.")
 
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Vendor',
+        related='order_id.partner_id',
+        readonly=True
+    )
+    child_contact_id = fields.Many2one(
+        'res.partner',
+        string='Child Contact',
+        domain="[('parent_id', '=', partner_id)]"
+    )
+    bank_account_id = fields.Many2one(
+        'res.partner.bank',
+        string='Bank Account',
+        domain="[('partner_id', '=', partner_id)]"
+    )
+
     @api.depends("journal_id")
     def _compute_get_journal_currency(self):
         for wzd in self:
@@ -150,6 +167,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             "payment_method_id": self.env.ref(
                 "account.account_payment_method_manual_out"
             ).id,
+            "percentage_advance": self.percentage_advance,
         }
 
     def make_advance_payment(self):
