@@ -1,0 +1,18 @@
+<odoo>
+    <record id="view_purchase_order_form_inherit_vendor_bill" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.vendor.bill</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="vendor_bill_count"
+                       widget="statinfo"
+                       string="Vendor Bills"
+                       icon="fa-file-invoice"
+                       attrs="{'invisible': [('vendor_bill_count', '=', 0)]}"
+                       nolabel="1"
+                       options="{'action': 'action_view_vendor_bills'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

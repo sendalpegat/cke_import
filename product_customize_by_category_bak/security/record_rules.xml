@@ -1,0 +1,30 @@
+<!-- security/record_rules.xml -->
+<odoo>
+    <record id="rule_custom_field_spec" model="ir.rule">
+        <field name="name">Specification Fields Access</field>
+        <field name="model_id" ref="model_product_category_custom_field"/>
+        <field name="domain_force">[('field_type', '=', 'spec')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record id="rule_custom_field_material" model="ir.rule">
+        <field name="name">Material Fields Access</field>
+        <field name="model_id" ref="model_product_category_custom_field"/>
+        <field name="domain_force">[('field_type', '=', 'material')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record id="rule_custom_field_cable" model="ir.rule">
+        <field name="name">Cable Fields Access</field>
+        <field name="model_id" ref="model_product_category_custom_field"/>
+        <field name="domain_force">[('field_type', '=', 'cable')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_custom_field_color" model="ir.rule">
+        <field name="name">Color Fields Access</field>
+        <field name="model_id" ref="model_product_category_custom_field"/>
+        <field name="domain_force">[('field_type', '=', 'color')]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

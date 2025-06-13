@@ -1,0 +1,76 @@
+<!-- views/report_product_template.xml -->
+<odoo>
+    <template id="report_product_template_pdf">
+        <t t-call="web.external_layout">
+            <div class="page" t-foreach="docs" t-as="doc">
+                <h2>Product Specification Report</h2>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <td t-field="doc.name"/>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td t-field="doc.categ_id.name"/>
+                    </tr>
+                </table>
+                
+                <t t-if="doc.spec_field_summary">
+                    <h3>Specification</h3>
+                    <p t-esc="doc.spec_field_summary"/>
+                </t>
+                
+                <h2>Product Material Report</h2>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <td t-field="doc.name"/>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td t-field="doc.categ_id.name"/>
+                    </tr>
+                </table>
+                
+                <t t-if="doc.material_field_summary">
+                    <h3>Material</h3>
+                    <p t-esc="doc.material_field_summary"/>
+                </t>
+
+                <h2>Product Cable Report</h2>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <td t-field="doc.name"/>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td t-field="doc.categ_id.name"/>
+                    </tr>
+                </table>
+                
+                <t t-if="doc.cable_field_summary">
+                    <h3>Cable</h3>
+                    <p t-esc="doc.cable_field_summary"/>
+                </t>
+
+                <h2>Product Color Report</h2>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <td t-field="doc.name"/>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td t-field="doc.categ_id.name"/>
+                    </tr>
+                </table>
+                
+                <t t-if="doc.color_field_summary">
+                    <h3>Color</h3>
+                    <p t-esc="doc.color_field_summary"/>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

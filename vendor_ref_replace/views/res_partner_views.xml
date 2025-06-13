@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_ref_reposition" model="ir.ui.view">
+        <field name="name">res.partner.form.ref.reposition</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Hapus field ref dari tab Sales & Purchase -->
+            <xpath expr="//field[@name='ref']" position="replace"/>
+            
+            <!-- Tambahkan field ref di bawah field name -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="ref" string="Vendor Code" placeholder="Vendor Code" required="True"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

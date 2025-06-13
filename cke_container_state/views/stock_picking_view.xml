@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_picking_form_custom_stages" model="ir.ui.view">
+            <field name="name">stock.picking.form.custom.stages</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <!-- Tambahkan status bar -->
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="custom_stage" widget="statusbar" 
+                        statusbar_visible="loaded,boarded,customs,arrived,done" 
+                        options="{'clickable': '1'}"/>
+                </xpath>
+
+                <!-- Tambahkan field tanggal di bawah status -->
+                <!-- <xpath expr="//div[hasclass('o_statusbar_status')]" position="after">
+                    <div class="row">
+                        <div class="col-12">
+                            <label string="Log Tanggal Status"/>
+                            <div class="row">
+                                <field name="date_loaded" class="col-3" readonly="1"/>
+                                <field name="date_boarded" class="col-3" readonly="1"/>
+                                <field name="date_customs" class="col-3" readonly="1"/>
+                                <field name="date_arrived" class="col-3" readonly="1"/>
+                                <field name="date_done_custom" class="col-3" readonly="1"/>
+                            </div>
+                        </div>
+                    </div>
+                </xpath> -->
+
+                <!-- Tambahkan tombol aksi -->
+                <xpath expr="//header//button[@name='button_validate']" position="before">
+                    <button name="action_loaded" string="Loaded" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'loaded')]}"/>
+                    <button name="action_boarded" string="Boarded" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'boarded')]}"/>
+                    <button name="action_customs" string="Customs" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'customs')]}"/>
+                    <button name="action_arrived" string="Arrived" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'arrived')]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

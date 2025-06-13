@@ -1,0 +1,19 @@
+<odoo>
+    <record id="view_purchase_order_line_form_dynamic" model="ir.ui.view">
+        <field name="name">purchase.order.line.form.dynamic</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_qty']" position="after">
+                <field name="dynamic_field_values">
+                    <tree editable="bottom">
+                        <field name="name" readonly="1"/>
+                        <field name="value_char" attrs="{'invisible': [('field_type', '!=', 'char')]}"/>
+                        <field name="value_integer" attrs="{'invisible': [('field_type', '!=', 'integer')]}"/>
+                        <field name="value_boolean" attrs="{'invisible': [('field_type', '!=', 'boolean')]}"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>

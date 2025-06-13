@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_category_field_definition,product.category.field.definition,model_product_category_field_definition,,1,1,1,1
+access_product_template_field_value,product.template.field.value,model_product_template_field_value,base.group_user,1,1,1,1
+access_purchase_order,purchase.order,model_purchase_order,,1,1,1,1
