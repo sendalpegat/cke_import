@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
-##############################################################################
-
 from odoo import api, models, _, fields
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError
@@ -182,7 +178,199 @@ class PurchaseOrderLine(models.Model):
 								total -= move.product_uom._compute_quantity(move.product_uom_qty, line.product_uom)
 							else:
 								total += move.product_uom._compute_quantity(move.product_uom_qty, line.product_uom)
-					line.qty_received = total       
+					line.qty_received = total
+  #untuk cek product pack sebelum di simpan  
+	# @api.constrains('product_id', 'pack_ids')
+	# def _check_pack_components(self):
+	# 	for line in self:
+	# 		if line.product_id.is_pack and not line.product_id.pack_ids:
+	# 			raise UserError(
+	# 				f"Product {line.product_id.name} is marked as pack but has no components!"
+	# 			)   
+    # Hapus @api.constrains dan ganti dengan @api.onchange
+	@api.onchange('product_id')
+	def _onchange_product_id_check_pack(self):
+		"""Memberikan warning jika produk pack tidak memiliki komponen"""
+		if self.product_id.product_tmpl_id.is_pack and not self.product_id.product_tmpl_id.pack_ids:
+			return {
+				'warning': {
+					'title': _("Warning"),
+					'message': _(
+						"Product %s is marked as a bundle but has no components!\n"
+						"You can save this record, but please configure components later."
+					) % self.product_id.default_code
+				}
+			}
+
+	# def write(self, vals):
+	# 	res = super().write(vals)
+	# 	for line in self:
+	# 		if line.product_id.product_tmpl_id.is_pack and not line.product_id.product_tmpl_id.pack_ids:
+	# 			_logger.warning(
+    #                 "Bundle Product %s has no components (Purchase Line ID: %s)", 
+    #                 line.product_id.name, line.id
+    #             )
+	# 	return res
+# class PurchaseOrder(models.Model):
+#     _inherit = 'purchase.order'
+    
+#     def action_recheck_bundle(self):
+#         """Tombol Re-check untuk validasi bundle di Purchase Order."""
+#         warning_messages = []
+#         for order in self:
+#             for line in order.order_line:
+#                 if line.product_id.is_pack:
+#                     # Cek apakah produk bundle memiliki komponen pack_ids
+#                     if not line.product_id.pack_ids:
+#                         warning_messages.append(
+#                             f"⚠️ Produk {line.product_id.name} adalah bundle, tetapi tidak memiliki komponen pack!"
+#                         )
+#                     else:
+#                         # Cek apakah semua komponen pack tercatat di receipt
+#                         moves = line.move_ids.filtered(lambda m: m.state != 'cancel')
+#                         pack_products = line.product_id.pack_ids.mapped('product_id')
+#                         received_products = moves.mapped('product_id')
+                        
+#                         missing_products = pack_products - received_products
+#                         if missing_products:
+#                             warning_messages.append(
+#                                 f"⚠️ Produk {line.product_id.name} memiliki komponen yang belum diterima: {', '.join(missing_products.mapped('name'))}"
+#                             )
+#         if warning_messages:
+#             raise UserError("\n".join(warning_messages))
+#         else:
+#             return {
+#                 'type': 'ir.actions.client',
+#                 'tag': 'display_notification',
+#                 'params': {
+#                     'type': 'success',
+#                     'message': '✅ Semua bundle dan komponennya valid!',
+#                 }
+#             }       
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    pack_line_ids = fields.One2many(
+        'product.pack',
+        compute='_compute_pack_lines',
+        string="Pack Components",
+        store=False
+    )
+  
+    def action_validate_product_packs(self):
+        error_messages = []
+        for order in self:
+            for line in order.order_line:
+                if line.product_id.is_pack:
+                    # Check pack components
+                    if not line.product_id.pack_ids:
+                        error_messages.append(
+                            f"Product {line.product_id.default_code} is a pack but has no components!"
+                        )
+                    
+                    # Check stock moves
+                    for move in line.move_ids:
+                        if not move.pack_id:
+                            error_messages.append(
+                                f"Stock move for {line.product_id.default_code} is missing pack components!"
+                            )
+        
+        if error_messages:
+            return {
+                'warning': {
+                    'title': 'Validation Error',
+                    'message': '\n'.join(error_messages)
+                }
+            }
+        else:
+            return {
+                'effect': {
+                    'fadeout': 'slow',
+                    'message': 'All pack products are validated successfully!',
+                    'type': 'rainbow_man'
+                }
+            }
+
+    @api.depends('order_line.product_id')
+    def _compute_pack_lines(self):
+        for order in self:
+            packs = self.env['product.pack']
+            for line in order.order_line:
+                if line.product_id and line.product_id.product_tmpl_id.is_pack:
+                    packs |= line.product_id.product_tmpl_id.pack_ids
+            order.pack_line_ids = packs
+
+    # def action_create_invoice(self):
+    #     invoices = self.env['account.move']
+    #     for order in self:
+    #         invoice_vals = order._prepare_invoice()
+    #         invoice = self.env['account.move'].create(invoice_vals)
+
+    #         for line in order.order_line:
+    #             if line.product_id.product_tmpl_id.is_pack:
+    #                 for pack in line.product_id.product_tmpl_id.pack_ids:
+    #                     # ✅ Validasi: standard_price wajib
+    #                     if not pack.product_id.standard_price or pack.product_id.standard_price <= 0:
+    #                         raise UserError(
+    #                             f"Produk komponen \"{pack.product_id.display_name}\" dari bundle \"{line.product_id.display_name}\" "
+    #                             f"belum memiliki Standard Price!\n\n"
+    #                             "Silakan isi terlebih dahulu di Master Produk untuk menghindari jurnal tidak seimbang."
+    #                         )
+
+    #                     # Buat PO line virtual
+    #                     fake_line = self.env['purchase.order.line'].new({
+    #                         'product_id': pack.product_id.id,
+    #                         'product_uom_qty': pack.qty_uom * line.product_qty,
+    #                         'product_uom': pack.uom_id.id,
+    #                         'price_unit': pack.product_id.standard_price,
+    #                         'order_id': order.id,
+    #                         'name': f"{pack.product_id.display_name} (from {line.product_id.display_name})"
+    #                     })
+
+    #                     # Buat invoice line dari PO line virtual
+    #                     invoice_line_vals = fake_line._prepare_account_move_line()
+
+    #                     # ✅ Fallback account_id ke akun hardcoded [69000000] jika kosong
+    #                     if not invoice_line_vals.get('account_id'):
+    #                         fallback_account = self.env['account.account'].search([('code', '=', '69000000')], limit=1)
+    #                         if not fallback_account:
+    #                             raise UserError(
+    #                                 "Akun fallback [69000000] belum ditemukan.\n"
+    #                                 "Silakan buat akun dengan kode '69000000' dan tipe 'Expenses'."
+    #                             )
+    #                         invoice_line_vals['account_id'] = fallback_account.id
+
+    #                     invoice_line_vals.update({'move_id': invoice.id})
+    #                     self.env['account.move.line'].create(invoice_line_vals)
+    #             else:
+    #                 # Produk biasa, gunakan standar
+    #                 invoice_line_vals = line._prepare_account_move_line()
+    #                 invoice_line_vals.update({'move_id': invoice.id})
+    #                 self.env['account.move.line'].create(invoice_line_vals)
+
+    #         invoices += invoice
+
+    #     # ✅ Return action vendor bill (tanpa external ID)
+    #     if invoices:
+    #         if len(invoices) == 1:
+    #             return {
+    #                 'name': 'Vendor Bill',
+    #                 'type': 'ir.actions.act_window',
+    #                 'view_mode': 'form',
+    #                 'res_model': 'account.move',
+    #                 'res_id': invoices.id,
+    #                 'target': 'current',
+    #             }
+    #         else:
+    #             return {
+    #                 'name': 'Vendor Bills',
+    #                 'type': 'ir.actions.act_window',
+    #                 'view_mode': 'tree,form',
+    #                 'res_model': 'account.move',
+    #                 'domain': [('id', 'in', invoices.ids)],
+    #             }
+    #     return True
 
 class StockPickingInherit(models.Model):
 	_inherit = 'stock.picking'
@@ -196,4 +384,4 @@ class StockMoveInherit(models.Model):
 class StockMoveLineInherit(models.Model):
 	_inherit = 'stock.move.line'
 
-	pack_id = fields.Many2one('product.pack',string="PACK")	
+	pack_id = fields.Many2one('product.pack',string="PACK")

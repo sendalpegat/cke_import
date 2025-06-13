@@ -1,6 +1,6 @@
 {
     'name': 'Purchase Order Due Date',
-    'version': '14.0.1.0.0',
+    'version': '14.0.13.06.25',
     'summary': 'Display Due Date from Account Move in Purchase Order',
     'description': 'Adds a field to display the due date from related invoices in the Purchase Order form view.',
     'category': 'Purchases',
@@ -11,6 +11,7 @@
     'depends': ['purchase', 'account'],
     'data': [
         'views/purchase_order_view.xml',
+        # 'views/account_move.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,

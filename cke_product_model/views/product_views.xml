@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Product Template Form View -->
+    <record id="view_product_template_form_custom" model="ir.ui.view">
+        <field name="name">product.template.form.custom</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_brand_id']" position="after">
+                <field name="factory_model_no"/>
+                <field name="manufacture_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Variant Form View -->
+    <record id="view_product_product_form_custom" model="ir.ui.view">
+        <field name="name">product.product.form.custom</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_brand_id']" position="after">
+                <field name="factory_model_no"/>
+                <field name="manufacture_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

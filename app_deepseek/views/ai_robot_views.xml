@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- <record id="baidu_ai_robot_form_view" model="ir.ui.view">
+        <field name="name">baidu.ai.robot.form</field>
+        <field name="model">ai.robot</field>
+        <field name="inherit_id" ref="app_chatgpt.ai_robot_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='openapi_api_key']" position="after">
+                <field name="client_secret" password="True"/>
+            </xpath>
+        </field>
+    </record> -->
+</odoo>

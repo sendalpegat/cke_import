@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit Purchase Order Form View -->
+        <record id="view_purchase_order_form_with_pack" model="ir.ui.view">
+            <field name="name">purchase.order.pack.form</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="pack_products" string="Pack Products" attrs="{'invisible': [('pack_line_ids', '=', False)]}">
+                        <field name="pack_line_ids" readonly="1">
+                            <tree string="Pack Components">
+                                <field name="default_code" string="Product"/>
+                                <field name="name"/>
+                                <field name="qty_uom"/>
+                                <field name="uom_id"/>
+                                <field name="standard_price"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

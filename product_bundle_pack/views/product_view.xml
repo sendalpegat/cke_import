@@ -13,8 +13,8 @@
                     <label for="is_pack"/> 
                 </div>
                 </xpath>
-                <field name="list_price" position="replace">
-                    <field name="list_price" widget='monetary' 
+                <field name="standard_price" position="replace">
+                    <field name="standard_price" widget='monetary' 
                         attrs= "{'readonly':[('cal_pack_price','=', True)]}"
                         options="{'currency_field': 'currency_id'}"
                      />
@@ -29,8 +29,11 @@
                                 <control>
                                     <create string="Add a product"/>
                                 </control>
-                                <field name="product_id"/>
-                                <field name="qty_uom"/>
+                                <field name="product_id" string="Product" widget="many2one_clickable"/>
+                                <field name="default_code" string="Internal Reference"/>
+                                <field name="name" string="Product Name"/>
+                                <field name="standard_price" string="Cost"/>
+                                <field name="qty_uom" string="Quantity"/>
                                 <field name="bi_image" class="oe_avatar" widget="image"/>
                             </tree>
                         </field>
@@ -114,4 +117,3 @@
         <menuitem id="menu_product_pack_main" name="Product Pack" parent="sale.product_menu_catalog" sequence="15" action="action_pack"/>
   </data>   
 </odoo>
-

@@ -1,66 +1,135 @@
+from odoo import models, fields, api
+
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    custom_field_ids = fields.One2many(
-        'product.category.custom.field',
+    spec_field_ids = fields.One2many(
+        'product.category.field.definition',
         'category_id',
         string='Specification',
+        domain=[('field_type', '=', 'spec')]
     )
 
-    custom_field2_ids = fields.One2many(
-        'product.category.custom.field2',
+    # motor_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Motor Type',
+    #     domain=[('field_type', '=', 'motor')]
+    # )
+
+    # bearing_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='bearing Type',
+    #     domain=[('field_type', '=', 'bearing')]
+    # )
+
+    # kss_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Knob Switch Speed',
+    #     domain=[('field_type', '=', 'kss')]
+    # )
+
+    # cablespeed_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Cable Speed',
+    #     domain=[('field_type', '=', 'cablespeed')]
+    # )
+
+    # remote_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Remote Control',
+    #     domain=[('field_type', '=', 'remote')]
+    # )
+
+    # tou_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Therm of Use',
+    #     domain=[('field_type', '=', 'tou')]
+    # )
+
+    # led_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='LED',
+    #     domain=[('field_type', '=', 'led')]
+    # )
+
+    # book_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Manual Book',
+    #     domain=[('field_type', '=', 'book')]
+    # )
+
+    material_field_ids = fields.One2many(
+        'product.category.field.definition',
         'category_id',
         string='Material',
-        help='Additional fields to be dynamically added to products under this category.'
+        domain=[('field_type', '=', 'material')]
     )
 
-    custom_field3_ids = fields.One2many(
-        'product.category.custom.field3',
+    cable_field_ids = fields.One2many(
+        'product.category.field.definition',
         'category_id',
         string='Cable',
-        help='Additional fields to be dynamically added to products under this category.'
+        domain=[('field_type', '=', 'cable')]
     )
 
-    custom_field4_ids = fields.One2many(
-        'product.category.custom.field4',
+    color_field_ids = fields.One2many(
+        'product.category.field.definition',
         'category_id',
         string='Color',
-        help='Additional fields to be dynamically added to products under this category.'
+        domain=[('field_type', '=', 'color')]
+    )
+
+    # packing_field_ids = fields.One2many(
+    #     'product.category.field.definition',
+    #     'category_id',
+    #     string='Packing Method',
+    #     domain=[('field_type', '=', 'packing')]
+    # )
+
+class ProductCategoryFieldDefinition(models.Model):
+    _name = 'product.category.field.definition'
+    _description = 'Product Category'
+    _order = 'sequence, id'
+
+    name = fields.Char(string='Name', required=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    field_type = fields.Selection([
+        ('spec', 'Specification'),
+        # ('motor', 'Motor type'),
+        # ('bearing', 'Bearing Type'),
+        # ('kss', 'Knob Switch Speed'),
+        # ('cablespeed', 'Cable Speed'),
+        # ('remote', 'Remote Control'),
+        # ('tou', 'Therm of Use'),
+        # ('led', 'LED'),
+        # ('book', 'Manual Book'),
+        ('material', 'Material'),
+        ('cable', 'Cable'),
+        ('color', 'Color')],
+        # ('packing', 'Packing Method')],
+        string='Type',
+        required=True,
+        default='spec'
+    )
+    category_id = fields.Many2one(
+        'product.category',
+        string='Category',
+        ondelete='cascade'
     )
 
     @api.model
     def create(self, vals):
-        # Tambahkan default value untuk custom_field_ids
-        if 'custom_field_ids' not in vals:
-            vals['custom_field_ids'] = [(0, 0, {
-                'name': 'Default Name',
-                'field_type': 'char',
-            })]
-        return super(ProductCategory, self).create(vals)
-
-    def create(self, vals):
-        # Tambahkan default value untuk custom_field_ids
-        if 'custom_field2_ids' not in vals:
-            vals['custom_field2_ids'] = [(0, 0, {
-                'name': 'Default Name',
-                'field_type': 'char',
-            })]
-        return super(ProductCategory, self).create(vals)
-
-    def create(self, vals):
-        # Tambahkan default value untuk custom_field_ids
-        if 'custom_field3_ids' not in vals:
-            vals['custom_field3_ids'] = [(0, 0, {
-                'name': 'Default Name',
-                'field_type': 'char',
-            })]
-        return super(ProductCategory, self).create(vals)
-
-    def create(self, vals):
-        # Tambahkan default value untuk custom_field_ids
-        if 'custom_field4_ids' not in vals:
-            vals['custom_field4_ids'] = [(0, 0, {
-                'name': 'Default Name',
-                'field_type': 'char',
-            })]
-        return super(ProductCategory, self).create(vals)
+        if 'field_type' not in vals:
+            if self.env.context.get('default_field_type'):
+                vals['field_type'] = self.env.context.get('default_field_type')
+            else:
+                vals['field_type'] = 'spec'
+        return super(ProductCategoryFieldDefinition, self).create(vals)
