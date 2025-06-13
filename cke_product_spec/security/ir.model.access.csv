@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_product_template_specification,product.template.specification,model_product_template_specification,,1,1,1,1
