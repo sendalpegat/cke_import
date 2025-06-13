@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="seq_commercial_invoice" model="ir.sequence">
+        <field name="name">Commercial Invoice Sequence</field>
+        <field name="code">custom.commercial.invoice</field>
+        <field name="prefix">CI/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="implementation">no_gap</field>
+    </record>
+</odoo>

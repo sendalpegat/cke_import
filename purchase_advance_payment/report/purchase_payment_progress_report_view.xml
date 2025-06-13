@@ -1,0 +1,27 @@
+<odoo>
+    <record id="view_purchase_payment_progress_report" model="ir.ui.view">
+        <field name="name">purchase.payment.progress.report.form</field>
+        <field name="model">purchase.payment.progress.report</field>
+        <field name="arch" type="xml">
+            <form string="Export Payment Progress">
+                <footer>
+                    <button name="export_xlsx" string="Download XLSX" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_purchase_payment_progress_report" model="ir.actions.act_window">
+        <field name="name">Export Payment Progress</field>
+        <field name="res_model">purchase.payment.progress.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_purchase_payment_progress_report"
+              name="Export Payment Progress"
+              parent="purchase.menu_purchase_root"
+              action="action_purchase_payment_progress_report"
+              sequence="100"/>
+</odoo>

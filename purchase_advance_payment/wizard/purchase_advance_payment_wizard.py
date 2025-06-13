@@ -1,6 +1,3 @@
-# Copyright (C) 2021 ForgeFlow S.L.
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html)
-
 from odoo import _, api, exceptions, fields, models
 from odoo.tools import float_compare
 
@@ -49,16 +46,24 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         related='order_id.partner_id',
         readonly=True
     )
-    child_contact_id = fields.Many2one(
-        'res.partner',
+
+    display_child_name = fields.Char(
         string='Child Contact',
-        domain="[('parent_id', '=', partner_id)]"
+        compute='_compute_display_child_name',
+        store=False
     )
+
     bank_account_id = fields.Many2one(
         'res.partner.bank',
         string='Bank Account',
         domain="[('partner_id', '=', partner_id)]"
     )
+
+    @api.depends('partner_id')
+    def _compute_display_child_name(self):
+        for rec in self:
+            children = rec.partner_id.child_ids
+            rec.display_child_name = children[0].name if children else ''
 
     @api.depends("journal_id")
     def _compute_get_journal_currency(self):
@@ -67,48 +72,69 @@ class AccountVoucherWizardPurchase(models.TransientModel):
                 wzd.journal_id.currency_id.id or self.env.user.company_id.currency_id.id
             )
 
+    # @api.constrains("amount_advance", "percentage_advance")
+    # def check_amount(self):
+    #     """
+    #     Validate the advance amount and percentage.
+    #     """
+    #     if self.percentage_advance < 0 or self.percentage_advance > 100:
+    #         raise exceptions.ValidationError(_("Percentage must be between 0 and 100."))
+
+    #     if self.amount_advance <= 0:
+    #         raise exceptions.ValidationError(_("Amount of advance must be positive."))
+
+    #     if self.env.context.get("active_id", False):
+    #         self.onchange_date()
+    #         if (
+    #             float_compare(
+    #                 self.currency_amount,
+    #                 self.order_id.amount_residual,
+    #                 precision_digits=2,
+    #             )
+    #             > 0
+    #         ):
+    #             raise exceptions.ValidationError(
+    #                 _("Amount of advance is greater than residual amount on purchase.")
+    #             )
+
+    # @api.constrains("amount_advance")
+    # def check_amount(self):
+    #     if self.amount_advance <= 0:
+    #         raise exceptions.ValidationError(_("Amount of advance must be positive."))
+    #     if self.env.context.get("active_id", False):
+    #         self.onchange_date()
+    #         if (
+    #             float_compare(
+    #                 self.currency_amount,
+    #                 self.order_id.amount_residual,
+    #                 precision_digits=2,
+    #             )
+    #             > 0
+    #         ):
+    #             raise exceptions.ValidationError(
+    #                 _("Amount of advance is greater than residual amount on purchase")
+    #             )
+
     @api.constrains("amount_advance", "percentage_advance")
     def check_amount(self):
-        """
-        Validate the advance amount and percentage.
-        """
-        if self.percentage_advance < 0 or self.percentage_advance > 100:
-            raise exceptions.ValidationError(_("Percentage must be between 0 and 100."))
-
-        if self.amount_advance <= 0:
-            raise exceptions.ValidationError(_("Amount of advance must be positive."))
-
-        if self.env.context.get("active_id", False):
-            self.onchange_date()
-            if (
-                float_compare(
-                    self.currency_amount,
-                    self.order_id.amount_residual,
-                    precision_digits=2,
-                )
-                > 0
-            ):
-                raise exceptions.ValidationError(
-                    _("Amount of advance is greater than residual amount on purchase.")
-                )
-
-    @api.constrains("amount_advance")
-    def check_amount(self):
-        if self.amount_advance <= 0:
-            raise exceptions.ValidationError(_("Amount of advance must be positive."))
-        if self.env.context.get("active_id", False):
-            self.onchange_date()
-            if (
-                float_compare(
-                    self.currency_amount,
-                    self.order_id.amount_residual,
-                    precision_digits=2,
-                )
-                > 0
-            ):
-                raise exceptions.ValidationError(
-                    _("Amount of advance is greater than residual amount on purchase")
-                )
+        for rec in self:
+            if rec.percentage_advance < 0 or rec.percentage_advance > 100:
+                raise exceptions.ValidationError(_("Percentage must be between 0 and 100."))
+            if rec.amount_advance <= 0:
+                raise exceptions.ValidationError(_("Amount of advance must be positive."))
+            if rec.env.context.get("active_id", False):
+                rec.onchange_date()
+                if (
+                    float_compare(
+                        rec.currency_amount,
+                        rec.order_id.amount_residual,
+                        precision_digits=2,
+                    )
+                    > 0
+                ):
+                    raise exceptions.ValidationError(
+                        _("Amount of advance is greater than residual amount on purchase.")
+                    )
 
     @api.model
     def default_get(self, fields_list):

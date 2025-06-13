@@ -28,9 +28,8 @@
         'wizard/explode_pack_wizard_view.xml',
         'security/ir.model.access.csv',
     ],
+    "images": ['static/description/icon.png'],
     "installable": True,
     "application": True,
     "auto_install": False,
-     "images":['static/description/Banner.png'],
-
 }
