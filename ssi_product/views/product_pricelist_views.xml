@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="product_pricelist_view" model="ir.ui.view">
+    <field name="name">product.pricelist.form</field>
+    <field name="model">product.pricelist</field>
+    <field name="inherit_id" ref="product.product_pricelist_view" />
+    <field name="arch" type="xml">
+
+        <xpath expr="//widget[@name='web_ribbon']" position="after">
+            <div class="oe_button_box" name="button_box">
+                <button
+                        class="oe_stat_button"
+                        name="action_view_price_rules"
+                        type="object"
+                        icon="fa-list"
+                    >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value"><field name="item_count" /></span>
+                        <span class="o_stat_text">Price Rules</span>
+                    </div>
+                </button>
+            </div>
+        </xpath>
+
+    </field>
+</record>
+<menuitem
+        id="product_pricelist_menu"
+        name="Pricelists"
+        parent="menu_pricelist_root"
+        action="product.product_pricelist_action2"
+        groups="pricelist_configurator_group"
+        sequence="1"
+    />
+</odoo>

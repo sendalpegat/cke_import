@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<menuitem
+        id="product_supplierinfo_menu"
+        name="Vendor Pricelists"
+        parent="menu_pricelist_root"
+        action="product.product_supplierinfo_type_action"
+        groups="vendor_pricelist_configurator_group"
+        sequence="2"
+    />
+</odoo>

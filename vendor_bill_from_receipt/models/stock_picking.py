@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # from odoo import models, fields, api
 # from odoo.exceptions import UserError
 
@@ -122,10 +123,17 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+=======
+from odoo import models, fields, api
+from odoo.exceptions import UserError
+
+
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     def action_create_vendor_bill(self):
+<<<<<<< HEAD
         """Action to create a vendor bill manually for a single picking."""
         self.ensure_one()
         if self.picking_type_code != 'incoming':
@@ -133,6 +141,19 @@ class StockPicking(models.Model):
         if not self.partner_id:
             raise UserError("No vendor specified for this receipt.")
 
+=======
+        """Action to create a vendor bill manually."""
+        self.ensure_one()
+
+        # Pastikan picking adalah tipe receipt (incoming shipment)
+        if self.picking_type_code != 'incoming':
+            raise UserError("This action is only available for incoming shipments.")
+
+        if not self.partner_id:
+            raise UserError("No vendor specified for this receipt.")
+
+        # Cek apakah sudah ada invoice yang dibuat untuk picking ini
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
         existing_invoice = self.env['account.move'].search([
             ('invoice_origin', '=', self.name),
             ('move_type', '=', 'in_invoice'),
@@ -141,6 +162,10 @@ class StockPicking(models.Model):
         if existing_invoice:
             raise UserError("A vendor bill has already been created for this receipt.")
 
+<<<<<<< HEAD
+=======
+        # Persiapkan data untuk invoice
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
         invoice_vals = {
             'partner_id': self.partner_id.id,
             'invoice_date': fields.Date.today(),
@@ -149,6 +174,7 @@ class StockPicking(models.Model):
             'invoice_line_ids': [],
         }
 
+<<<<<<< HEAD
         for move in self.move_ids_without_package:
             product = move.product_id
             price_unit = product.standard_price or 0.0
@@ -161,6 +187,25 @@ class StockPicking(models.Model):
             }
             invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
 
+=======
+        # Tambahkan baris invoice berdasarkan move lines
+        for move in self.move_ids_without_package:
+            if move.purchase_line_id:
+                price_unit = move.purchase_line_id.price_unit
+            else:
+                price_unit = 0.0
+
+            invoice_line_vals = {
+                'product_id': move.product_id.id,
+                'quantity': move.quantity_done,
+                'price_unit': price_unit,
+                'name': move.product_id.name,
+                'account_id': move.product_id.property_account_expense_id.id or move.product_id.categ_id.property_account_expense_categ_id.id,
+            }
+            invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
+
+        # Buat invoice
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
         if invoice_vals['invoice_line_ids']:
             invoice = self.env['account.move'].create(invoice_vals)
             return {
@@ -171,6 +216,7 @@ class StockPicking(models.Model):
                 'target': 'current',
             }
         else:
+<<<<<<< HEAD
             raise UserError("No products with quantities received to create a vendor bill.")
 
     def action_create_multiple_vendor_bills(self):
@@ -304,3 +350,6 @@ class StockPicking(models.Model):
 #             }
 #         else:
 #             raise UserError("No products with quantities received to create a vendor bill.")
+=======
+            raise UserError("No products with quantities received to create a vendor bill.")
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c

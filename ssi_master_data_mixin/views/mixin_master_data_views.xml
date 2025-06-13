@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 OpenSynergy Indonesia
+     Copyright 2021 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+<record id="mixin_master_data_view_search" model="ir.ui.view">
+    <field name="name">mixin.master_data - search</field>
+    <field name="model">mixin.master_data</field>
+    <field name="arch" type="xml">
+        <search>
+            <field name="id" />
+            <field name="name" />
+            <field name="code" />
+        </search>
+    </field>
+</record>
+
+<record id="mixin_master_data_view_tree" model="ir.ui.view">
+    <field name="name">mixin.master_data -tree</field>
+    <field name="model">mixin.master_data</field>
+    <field name="arch" type="xml">
+        <tree>
+           <header>
+                <button
+                        name="action_reset_code"
+                        type="object"
+                        string="Reset code"
+                        confirm="Reset code. Are you sure?"
+                    />
+                <button
+                        name="action_generate_code"
+                        type="object"
+                        string="Generate code"
+                        confirm="Generate code. Are you sure?"
+                    />
+            </header>
+            <field name="id" optional="hide" />
+            <field name="code" />
+            <field name="name" />
+            <field name="activity_ids" widget="list_activity" optional="show" />
+            <field name="active" widget="boolean_toggle" />
+        </tree>
+    </field>
+</record>
+
+<record id="mixin_master_data_view_form" model="ir.ui.view">
+    <field name="name">mixin.master_data - form</field>
+    <field name="model">mixin.master_data</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                <button
+                        name="action_generate_code"
+                        string="Generate Code"
+                        type="object"
+                        class="oe_highlight"
+                    />
+            </header>
+            <sheet>
+                <div name="div_smart_buttons" class="oe_button_box" />
+                <group name="group_1" colspan="4" col="2">
+                    <field name="name" />
+                    <field name="code" />
+                    <field name="active" widget="boolean_toggle" />
+                </group>
+                <notebook>
+                    <page name="note" string="Note">
+                        <field name="note" colspan="4" nolabel="1" />
+                    </page>
+                </notebook>
+            </sheet>
+            <div class="oe_chatter">
+                <field name="message_follower_ids" groups="base.group_user" />
+                <field name="activity_ids" />
+                <field name="message_ids" />
+            </div>
+        </form>
+    </field>
+</record>
+
+</odoo>

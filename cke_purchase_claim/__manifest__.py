@@ -1,7 +1,10 @@
 {
     'name': 'Purchase Claim',
     'version': '14.0.1.0.0',
+<<<<<<< HEAD
     'category': 'Purchases',
+=======
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
     'summary': 'Manage purchase claims to vendors',
     'description': """
         This module allows you to manage purchase claims to vendors.
@@ -11,7 +14,15 @@
         - Integration with existing Odoo models such as purchase orders and vendors.
         - Security rules to manage access rights for different user roles.
     """,
+<<<<<<< HEAD
     'author': 'Your Name',
+=======
+    'category': 'Custom',
+    'author': 'PT Industrial Multi Fan',
+    'maintainer': 'aRai',
+    'license': 'LGPL-3',
+    'website': 'https://kipascke.co.id',
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
     'depends': ['base', 'purchase'],
     'data': [
         'security/ir.model.access.csv',
@@ -20,6 +31,10 @@
         'views/purchase_claim_view.xml',
         'views/purchase_claim_menu.xml',
     ],
+<<<<<<< HEAD
+=======
+    'images': ['static/description/icon.png'],
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
     'installable': True,
     'application': True,
     'auto_install': False,

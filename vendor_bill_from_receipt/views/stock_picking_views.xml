@@ -6,11 +6,16 @@
         <field name="arch" type="xml">
             <!-- Tambahkan tombol Create Vendor Bill -->
             <xpath expr="//header" position="inside">
+<<<<<<< HEAD
                 <button string="Create Commercial Invoice" type="object" name="action_create_vendor_bill"
+=======
+                <button string="Create Vendor Bill" type="object" name="action_create_vendor_bill"
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
                         class="btn-primary" attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}"/>
             </xpath>
         </field>
     </record>
+<<<<<<< HEAD
 
     <!-- New Action untuk Multi Create Vendor Bill -->
     <record id="action_create_multiple_vendor_bills" model="ir.actions.server">
@@ -28,4 +33,6 @@
               parent="stock.menu_stock_warehouse_mgmt"
               action="action_create_multiple_vendor_bills"
               sequence="10"/>
+=======
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
 </odoo>

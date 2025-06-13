@@ -26,6 +26,7 @@ class ProductTemplate(models.Model):
     cal_pack_price = fields.Boolean(string='Calculate Pack Price')
     pack_ids = fields.One2many('product.pack', 'bi_product_template', string='Product Components')
 
+<<<<<<< HEAD
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
@@ -46,6 +47,36 @@ class ProductTemplate(models.Model):
             total = sum(line.qty_uom * line.product_id.standard_price for line in self.pack_ids if line.product_id)
             if total > 0:
                 self.standard_price = total
+=======
+	@api.model
+	def create(self,vals):
+		total = 0
+		res = super(ProductProduct,self).create(vals)
+		if res.cal_pack_price:
+			if 'pack_ids' in vals or 'cal_pack_price' in vals:
+					for pack_product in res.pack_ids:
+							qty = pack_product.qty_uom
+							price = pack_product.product_id.standard_price
+							total += qty * price
+		if total > 0:
+			res.standard_price = total
+		return res
+
+	def write(self,vals):
+		total = 0
+		res = super(ProductProduct, self).write(vals)
+		for pk in self:
+			if pk.cal_pack_price:
+				if 'pack_ids' in vals or 'cal_pack_price' in vals:
+					for pack_product in pk.pack_ids:
+						qty = pack_product.qty_uom
+						price = pack_product.product_id.standard_price
+						total += qty * price
+
+		if total > 0:
+			self.standard_price = total
+		return res
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
 
 class PurchaseOrder(models.Model):
 	_inherit = 'purchase.order'		

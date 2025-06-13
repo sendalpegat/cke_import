@@ -109,8 +109,13 @@ class ProductProduct(models.Model):
     )
 
     tou = fields.Selection(
+<<<<<<< HEAD
         [('yes', 'Yes - Reset Thermal Protector'), ('no', 'No')],
         string='Thermofuse',
+=======
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Therm of Use',
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
         default='no'
     )
 

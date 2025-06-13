@@ -2,6 +2,7 @@
     'name': 'Purchase Order Timeline',
     'version': '14.0.1.0.0',
     'description': 'Purchase Order Timeline',
+    'category': 'Custom',
     'author': 'PT Industrial Multi Fan',
     'maintainer': 'aRai',
     'license': 'LGPL-3',

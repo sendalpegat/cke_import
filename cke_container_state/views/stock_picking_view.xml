@@ -13,6 +13,7 @@
                         options="{'clickable': '1'}"/>
                 </xpath>
 
+<<<<<<< HEAD
                 <!-- Tambahkan field tanggal di bawah status -->
                 <!-- <xpath expr="//div[hasclass('o_statusbar_status')]" position="after">
                     <div class="row">
@@ -38,6 +39,17 @@
                     <button name="action_customs" string="Customs" type="object" class="oe_highlight" 
                         attrs="{'invisible': [('custom_stage', '!=', 'customs')]}"/>
                     <button name="action_arrived" string="Arrived" type="object" class="oe_highlight" 
+=======
+                <!-- Tambahkan tombol aksi -->
+                <xpath expr="//header//button[@name='button_validate']" position="before">
+                    <button name="open_date_wizard('loaded')" string="Loaded" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'loaded')]}"/>
+                    <button name="open_date_wizard('boarded')" string="Boarded" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'boarded')]}"/>
+                    <button name="open_date_wizard('customs')" string="Customs" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('custom_stage', '!=', 'customs')]}"/>
+                    <button name="open_date_wizard('arrived')" string="Arrived" type="object" class="oe_highlight" 
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
                         attrs="{'invisible': [('custom_stage', '!=', 'arrived')]}"/>
                 </xpath>
             </field>

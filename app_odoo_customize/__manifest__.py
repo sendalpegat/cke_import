@@ -130,6 +130,7 @@
         'base_setup',
         'web',
         'mail',
+        'purchase',
         # 'iap',
         # 'digest',
         # when enterprise

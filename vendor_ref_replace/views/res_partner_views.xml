@@ -10,7 +10,11 @@
             
             <!-- Tambahkan field ref di bawah field name -->
             <xpath expr="//field[@name='name']" position="after">
+<<<<<<< HEAD
                 <field name="ref" string="Vendor Code" placeholder="Vendor Code" required="True"/>
+=======
+                <field name="ref" string="Vendor Code" placeholder="Vendor Code"/>
+>>>>>>> 14235b34476058108377e4dd1d0e42c42ff8007c
             </xpath>
         </field>
     </record>

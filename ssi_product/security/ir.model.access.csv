@@ -1,0 +1,27 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_uom_category_configurator,uom.category - configurator,uom.model_uom_category,uom_category_group,1,1,1,1
+access_uom_category_all,uom.category - all,uom.model_uom_category,,1,0,0,0
+access_uom_uom_configurator,uom.uom - configurator,uom.model_uom_uom,uom_uom_group,1,1,1,1
+access_uom_uom_all,uom.uom - all,uom.model_uom_uom,,1,0,0,0
+access_product_category_configurator,product.category - configurator,product.model_product_category,product_category_group,1,1,1,1
+access_product_category_all,product.category - all,product.model_product_category,,1,0,0,0
+access_product_packaging_configurator,product.packaging - configurator,product.model_product_packaging,product_packaging_group,1,1,1,1
+access_product_packaging_all,product.packaging - all,product.model_product_packaging,,1,0,0,0
+access_product_attribute_configurator,product.attribute - configurator,product.model_product_attribute,product_attribute_group,1,1,1,1
+access_product_attribute_all,product.attribute - all,product.model_product_attribute,,1,0,0,0
+access_product_attribute_value_configurator,product.attribute.value - configurator,product.model_product_attribute_value,product_attribute_group,1,1,1,1
+access_product_attribute_value_all,product.attribute.value - all,product.model_product_attribute_value,,1,0,0,0
+access_product_template_configurator,product.template - configurator,product.model_product_template,product_configurator_group,1,1,1,1
+access_product_template_all,product.template - all,product.model_product_template,,1,0,0,0
+access_product_product_configurator,product.product - configurator,product.model_product_product,product_configurator_group,1,1,1,1
+access_product_product_all,product.product - all,product.model_product_product,,1,0,0,0
+access_product_template_attribute_line_configurator,product.template.attribute.line - configurator,product.model_product_template_attribute_line,product_configurator_group,1,1,1,1
+access_product_template_attribute_line_all,product.template.attribute.line - all,product.model_product_template_attribute_line,,1,0,0,0
+access_product_pricelist_configurator,product.pricelist - configurator,product.model_product_pricelist,pricelist_configurator_group,1,1,1,1
+access_product_pricelist_all,product.pricelist - all,product.model_product_pricelist,,1,0,0,0
+access_product_pricelist_item_configurator,product.pricelist.item - configurator,product.model_product_pricelist_item,pricelist_configurator_group,1,1,1,1
+access_product_pricelist_item_all,product.pricelist.item - all,product.model_product_pricelist_item,,1,0,0,0
+access_product_supplierinfo_configurator,product.supplierinfo - configurator,product.model_product_supplierinfo,vendor_pricelist_configurator_group,1,1,1,1
+access_product_supplierinfo_all,product.supplierinfo - all,product.model_product_supplierinfo,,1,0,0,0
+access_product_brand_product_manager,product.brand,model_product_brand,ssi_product.product_brand_group,1,1,1,1
+access_product_brand_public,product.brand.public,model_product_brand,,1,0,0,0
