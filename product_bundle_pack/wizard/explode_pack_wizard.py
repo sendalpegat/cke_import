@@ -49,49 +49,16 @@ class ExplodePackWizard(models.TransientModel):
         lines_to_remove = move.invoice_line_ids.filtered(lambda l: l.product_id.product_tmpl_id.is_pack)
         lines_to_remove.unlink()
 
-        total_debit = 0.0
-
         # Tambahkan komponen baru
         for line in self.line_ids:
-            if line.price_unit <= 0:
-                raise UserError(
-                    f"Komponen \"{line.product_id.display_name}\" memiliki harga 0.\n"
-                    "Silakan isi Standard Price terlebih dahulu untuk menghindari jurnal tidak seimbang."
-                )
-
-            if line.qty_uom <= 0:
-                raise UserError(
-                    f"Kuantitas tidak valid untuk komponen \"{line.product_id.display_name}\"."
-                )
-
-            account_id = line.account_id.id
-            total = line.qty_uom * line.price_unit
-            total_debit += total
-
             self.env['account.move.line'].create({
                 'move_id': move.id,
                 'product_id': line.product_id.id,
                 'quantity': line.qty_uom,
                 'price_unit': line.price_unit,
-                'account_id': account_id,
-                'debit': total,
+                'account_id': line.account_id.id,
                 'name': line.description,
             })
-
-        # Tambahkan baris hutang vendor (credit)
-        partner = move.partner_id
-        payable_account = partner.property_account_payable_id
-        if not payable_account:
-            raise UserError("Vendor tidak memiliki akun hutang yang disetel. Periksa 'Account Payable' di form vendor.")
-
-        self.env['account.move.line'].create({
-            'move_id': move.id,
-            'account_id': payable_account.id,
-            'partner_id': partner.id,
-            'credit': total_debit,
-            'name': 'Hutang dari komponen produk bundle',
-        })
-
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
@@ -112,6 +79,9 @@ class ExplodePackLine(models.TransientModel):
     account_id = fields.Many2one('account.account', string="Expense Account", required=True)
     description = fields.Char("Description")
 
+
+# OPTIONAL: Inject button into account.move via product_bundle_pack
+from odoo import models as base_models
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
