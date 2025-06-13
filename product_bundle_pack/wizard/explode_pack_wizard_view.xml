@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_explode_pack_wizard_form" model="ir.ui.view">
+            <field name="name">explode.pack.wizard.form</field>
+            <field name="model">explode.pack.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Explode Product Pack">
+                    <group>
+                        <field name="move_id" readonly="1"/>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="qty_uom"/>
+                            <field name="price_unit"/>
+                            <field name="account_id"/>
+                            <field name="description"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button string="Confirm and Replace"
+                                type="object"
+                                name="button_confirm"
+                                class="btn-primary"/>
+                        <button string="Cancel"
+                                special="cancel"
+                                class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_explode_pack_wizard" model="ir.actions.act_window">
+            <field name="name">Explode Product Pack</field>
+            <field name="res_model">explode.pack.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{}</field>
+        </record>
+    </data>
+</odoo>
