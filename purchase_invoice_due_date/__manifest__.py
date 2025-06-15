@@ -11,7 +11,7 @@
     'depends': ['purchase', 'account'],
     'data': [
         'views/purchase_order_view.xml',
-        # 'views/account_move.xml',
+        'views/account_move_view.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,

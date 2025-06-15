@@ -20,6 +20,12 @@
                         string="Validate"
                         class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'commercial_invoice')]}"/>
+
+                <button name="button_cancel_commercial_invoice"
+                        type="object"
+                        string="Cancel Commercial Invoice"
+                        class="btn-danger"
+                        attrs="{'invisible': [('state', '!=', 'commercial_invoice')]}"/>            
             </xpath>
 
             <xpath expr="//field[@name='ref']" position="after">

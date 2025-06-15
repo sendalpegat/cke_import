@@ -43,6 +43,26 @@ class AccountMove(models.Model):
         compute_sudo=True  # Menjalankan komputasi dengan hak akses superuser
     )
 
+    today_date = fields.Date(
+        string="Today",
+        compute="_compute_today_date",
+        store=False
+    )
+
+    total_days = fields.Integer(
+        string="Total Days",
+        compute="_compute_total_days",
+        store=False
+    )
+
+    purchase_order_id = fields.Many2one(
+        'purchase.order',
+        string="Purchase Order",
+        compute="_compute_purchase_order_id",
+        store=True,
+        readonly=True
+    )
+
     @api.depends('invoice_date_due')
     def _compute_due_status(self):
         today = fields.Date.today()  # Gunakan fields.Date.today() untuk menjaga kompatibilitas timezone
@@ -52,6 +72,51 @@ class AccountMove(models.Model):
             else:
                 move.due_status = False
 
+    @api.depends('invoice_line_ids.purchase_line_id')
+    def _compute_purchase_order_id(self):
+        for move in self:
+            po_ids = move.invoice_line_ids.mapped('purchase_line_id.order_id')
+            move.purchase_order_id = po_ids[0] if po_ids else False
+
+
+    @api.depends()
+    def _compute_today_date(self):
+        today = fields.Date.context_today(self)
+        for move in self:
+            move.today_date = today
+
+    @api.depends('invoice_date_due')
+    def _compute_total_days(self):
+        today = fields.Date.context_today(self)
+        for move in self:
+            if move.invoice_date_due:
+                move.total_days = (move.invoice_date_due - today).days
+            else:
+                move.total_days = 0
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    purchase_line_id = fields.Many2one(
+        'purchase.order.line',
+        string="Purchase Order Line",
+        compute='_compute_purchase_line_id',
+        store=True,
+        readonly=True
+    )
+
+    @api.depends('move_id.invoice_origin', 'product_id')
+    def _compute_purchase_line_id(self):
+        for line in self:
+            po_line = False
+            if line.move_id.invoice_origin and line.product_id and line.price_unit:
+                domain = [
+                    ('order_id.name', '=', line.move_id.invoice_origin),
+                    ('product_id', '=', line.product_id.id),
+                    ('price_unit', '=', line.price_unit),
+                ]
+                po_line = self.env['purchase.order.line'].search(domain, limit=1)
+            line.purchase_line_id = po_line
 
 # Perbaikan yang dilakukan:
 # Tambahkan default=False pada field due_status

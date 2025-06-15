@@ -85,6 +85,13 @@ class AccountMove(models.Model):
         for move in self:
             super(AccountMove, move).action_post()
 
+    def button_cancel_commercial_invoice(self):
+        for move in self:
+            if move.state == 'commercial_invoice':
+                move.state = 'draft'
+                move.line_ids.remove_move_reconcile()
+                move.button_cancel()  # jika perlu batalkan invoice sepenuhnya
+
 
     @api.depends("advance_payment_ids.state", "amount_total", "amount_residual")
     def _compute_advance_payment_status(self):

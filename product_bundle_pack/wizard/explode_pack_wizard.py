@@ -81,8 +81,6 @@ class ExplodePackLine(models.TransientModel):
 
 
 # OPTIONAL: Inject button into account.move via product_bundle_pack
-from odoo import models as base_models
-
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
