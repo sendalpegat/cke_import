@@ -44,6 +44,7 @@ class ExplodePackWizard(models.TransientModel):
     def button_confirm(self):
         self.ensure_one()
         move = self.move_id
+        order_ref = move.purchase_id.name  # Ambil referensi PO
 
         # Hapus invoice line pack
         lines_to_remove = move.invoice_line_ids.filtered(lambda l: l.product_id.product_tmpl_id.is_pack)
@@ -57,8 +58,9 @@ class ExplodePackWizard(models.TransientModel):
                 'quantity': line.qty_uom,
                 'price_unit': line.price_unit,
                 'account_id': line.account_id.id,
-                'name': line.description,
+                'name': f"[{order_ref}] {line.description}" if order_ref else line.description,
             })
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',

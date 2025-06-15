@@ -24,6 +24,7 @@
         'views/product_view.xml',
         'views/purchase_order_pack_view.xml',
         'views/account_move_explode_button.xml',
+        'views/account_move_line_view.xml',
         'wizard/product_bundle_wizard_view.xml',
         'wizard/explode_pack_wizard_view.xml',
         'security/ir.model.access.csv',
