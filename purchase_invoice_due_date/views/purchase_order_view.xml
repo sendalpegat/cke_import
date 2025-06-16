@@ -1,21 +1,68 @@
 <odoo>
+    <!-- FORM VIEW INHERIT -->
     <record id="view_purchase_order_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
+
+            <!-- Tambahkan expected_invoice_due_date di atas -->
             <xpath expr="//field[@name='date_order']" position="after">
-                <field name="invoice_date_due" readonly="1"/>
-                <field name="today_date" readonly="1"/>
-                <field name="total_days" readonly="1"/>
+                <field name="expected_invoice_due_date" readonly="1"/>
+                <!-- <field name="date_order"/> -->
+                <field name="expected_due_status" readonly="1"
+                       widget="badge"
+                       decoration-danger="expected_due_status == 'overdue'"
+                       decoration-success="expected_due_status == 'not_due'"/>
+                <field name="expected_total_days" readonly="1"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
-                <field name="invoice_date_due" readonly="1"/>
-                <field name="due_status" readonly="1"/>
-                <field name="total_days" readonly="1"/>
-            </xpath>
-        
+            <!-- Tambahan kolom di tree order_line -->
+            <!-- <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after"> -->
+
+                <!-- Estimasi (Expected) -->
+                <!-- <field name="expected_invoice_due_date" readonly="1"/>
+                <field name="expected_due_status" readonly="1"
+                       widget="badge"
+                       decoration-danger="expected_due_status == 'overdue'"
+                       decoration-success="expected_due_status == 'not_due'"/>
+                <field name="expected_total_days" readonly="1"/> -->
+
+                <!-- Data aktual dari Vendor Bill -->
+                <!-- <field name="actual_invoice_due_date" readonly="1"/>
+                <field name="actual_due_status" readonly="1"
+                       widget="badge"
+                       decoration-danger="actual_due_status == 'overdue'"
+                       decoration-success="actual_due_status == 'not_due'"/>
+                <field name="actual_total_days" readonly="1"/>
+            </xpath> -->
+
         </field>
     </record>
+
+    <!-- SEARCH VIEW INHERIT -->
+<!--     <record id="view_purchase_order_search_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.search.inherit.due</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml"> -->
+
+            <!-- Tambahan filter berdasarkan status invoice -->
+         <!--    <xpath expr="//filter[@name='draft']" position="after">
+                <filter string="Overdue Invoices" name="filter_po_invoice_overdue"
+                        domain="[('invoice_ids.due_status', '=', 'overdue')]"/>
+                <filter string="Not Due Invoices" name="filter_po_invoice_not_due"
+                        domain="[('invoice_ids.due_status', '=', 'not_due')]"/>
+                <filter string="Has Invoices" name="filter_po_invoice_exist"
+                        domain="[('invoice_ids', '!=', False)]"/>
+            </xpath> -->
+
+            <!-- Group By tambahan -->
+           <!--  <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="Vendor" name="group_by_vendor" context="{'group_by': 'partner_id'}"/>
+                <filter string="Expected Due Date" name="group_by_expected" context="{'group_by': 'expected_invoice_due_date'}"/>
+            </xpath> -->
+
+<!--         </field>
+    </record> -->
 </odoo>

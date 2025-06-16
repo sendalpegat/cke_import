@@ -32,6 +32,23 @@
                 <field name="container_number"/>
                 <field name="receipt_date"/>
             </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Outstanding Debits"
+                      attrs="{'invisible': [('move_type', '!=', 'in_invoice')]}">
+                    <field name="outstanding_debit_line_ids" nolabel="1">
+                        <tree>
+                            <field name="date"/>
+                            <field name="ref"/>
+                            <field name="account_id"/>
+                            <field name="debit"/>
+                            <field name="amount_residual"/>
+                            <field name="move_id" widget="many2one" options="{'no_create': True}"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
         </field>
     </record>
 </odoo>

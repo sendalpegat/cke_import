@@ -4,6 +4,7 @@
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
             <tree string="Supplier">
+                <field name="ref" string="Vendor Code"/>
                 <field name="parent_id" string="Company"/>
                 <field name="display_child_name" string="Beneficiary"/>
                 <field name="street"/>

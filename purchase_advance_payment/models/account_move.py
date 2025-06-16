@@ -35,6 +35,13 @@ class AccountMove(models.Model):
         store=False,
     )
 
+    outstanding_debit_line_ids = fields.One2many(
+        'account.move.line',
+        compute='_compute_outstanding_debits',
+        string='Outstanding Debits',
+        store=False,
+    )
+
     @api.depends('invoice_origin')
     def _compute_receipt_date(self):
         for move in self:
@@ -53,9 +60,24 @@ class AccountMove(models.Model):
     #         else:
     #             super(AccountMove, move).action_post()
 
+    # def action_post(self):
+    #     for move in self:
+    #         if move.move_type == 'in_invoice' and move.state == 'draft':
+    #             if not move.name or move.name == '/':
+    #                 move.name = move._get_sequence()
+    #             move.state = 'commercial_invoice'
+    #         else:
+    #             super(AccountMove, move).action_post()
+    #             
     def action_post(self):
         for move in self:
             if move.move_type == 'in_invoice' and move.state == 'draft':
+                # Tambahan: Link manual ke purchase jika belum ada
+                if not move.purchase_id and move.invoice_origin:
+                    po = self.env['purchase.order'].search([('name', '=', move.invoice_origin)], limit=1)
+                    if po:
+                        move.purchase_id = po
+
                 if not move.name or move.name == '/':
                     move.name = move._get_sequence()
                 move.state = 'commercial_invoice'
@@ -105,3 +127,17 @@ class AccountMove(models.Model):
                     inv.advance_payment_status = "partial"
                 else:
                     inv.advance_payment_status = "not_paid"
+
+    @api.depends('partner_id')
+    def _compute_outstanding_debits(self):
+        for move in self:
+            if move.partner_id:
+                move.outstanding_debit_line_ids = self.env['account.move.line'].search([
+                    ('partner_id', '=', move.partner_id.id),
+                    ('account_id.internal_type', '=', 'payable'),
+                    ('reconciled', '=', False),
+                    ('debit', '>', 0),
+                    ('company_id', '=', move.company_id.id)
+                ])
+            else:
+                move.outstanding_debit_line_ids = False

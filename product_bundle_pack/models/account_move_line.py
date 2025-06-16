@@ -1,4 +1,3 @@
-# Di models/account_move_line.py
 from odoo import api, models, fields
 
 class AccountMoveLine(models.Model):

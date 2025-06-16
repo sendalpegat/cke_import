@@ -1,91 +1,68 @@
-# Purchase Advance Payment - Custom Enhancement
+Purchase Advance Payment - Custom Enhancement
+=============================================
 
-Modul ini merupakan pengembangan dari sistem advance payment pada Purchase Order dan Vendor Bills di Odoo 14.0, yang memberikan fitur tambahan seperti pengelolaan pembayaran bertahap, validasi komersial invoice, dan ekspor laporan pembayaran.
+Modul Odoo 14.0 ini menambahkan fitur advance payment dan pelacakan pembayaran PO & vendor bill.
 
-## 🔧 Fitur Utama
+-------------------------------------------------------
+Fitur Utama
+===========
 
-### 1. Advance Payment via Purchase Order
-- Wizard interaktif dengan input persentase atau nominal pembayaran.
-- Validasi sisa jumlah (`residual`) sebelum membuat pembayaran.
-- Pembayaran tercatat dalam tab *Payment Advances* di PO.
+💸 1. Advance Payment via Purchase Order
+----------------------------------------
+- Wizard interaktif dengan input persentase atau nominal.
+- Validasi sisa tagihan (`residual`) otomatis.
+- Pembayaran tampil di tab *Payment Advances* dalam PO.
 
-### 2. Advance Payment via Vendor Bills
-- Wizard serupa seperti PO, dengan referensi ke faktur vendor.
-- Pembayaran tercatat dalam tab *Payment Advances* di Vendor Bill.
+💰 2. Advance Payment via Vendor Bill
+-------------------------------------
+- Wizard serupa, berbasis invoice.
+- Pembayaran tercatat di tab *Payment Advances* di vendor bill.
 
-### 3. Status dan Tracking
-- `advance_payment_status` dan `payment_progress` otomatis dihitung.
-- Tampilan badge pada tree dan form untuk status: `not_paid`, `partial`, `paid`, `down_payment`, `commercial_invoice`, dll.
+📊 3. Tracking Status Pembayaran
+--------------------------------
+- Field `advance_payment_status`, `payment_progress` otomatis dihitung.
+- Lencana (badge) untuk status seperti `not_paid`, `partial`, `paid`, `commercial_invoice`.
 
-### 4. Commercial Invoice State
-- Tambahan state `commercial_invoice` pada `account.move`.
-- Tombol `Validate` khusus untuk memindahkan draft menjadi `commercial_invoice`.
-- Tombol **Cancel Commercial Invoice** disediakan untuk membatalkan dan mengembalikan ke draft.
+📄 4. Commercial Invoice State
+------------------------------
+- Tambahan state `commercial_invoice` untuk `account.move`.
+- Tombol `Validate` & `Cancel Commercial Invoice`.
+- Penomoran otomatis: `CI/2025/00001` (kode: `custom.commercial.invoice`).
+- Otomatis **link ke PO** berdasarkan `invoice_origin` agar field `purchase_id` dan **PO Reference** terisi.
 
-### 5. Sequence Khusus Commercial Invoice
-- Otomatis membuat penomoran dengan format: `CI/2025/00001`
-- Kode sequence: `custom.commercial.invoice`
+📤 5. Export Payment Progress (XLSX)
+-----------------------------------
+- Menu: *Purchase > Export Payment Progress*
+- Menyediakan laporan Excel berisi daftar PO, status pembayaran, dan sisa tagihan.
 
-### 6. Export Payment Progress to XLSX
-- Menu baru "Export Payment Progress" di modul Purchase.
-- Menghasilkan file Excel berisi daftar PO beserta status pembayaran dan sisa tagihan.
+-------------------------------------------------------
+Integrasi dengan Bundle Pack
+============================
 
----
+- Jika digunakan bersama `product_bundle_pack`, field `PO Reference` di invoice line akan tetap muncul saat status `commercial_invoice`.
+- Tidak perlu dependensi langsung, hanya perlu pastikan invoice memiliki `invoice_origin`.
 
-## 📄 File yang Ditambahkan / Dimodifikasi
+-------------------------------------------------------
+Instalasi
+=========
 
-### Python
-- `models/account_move.py`:
-  - Tambahan field `container_number`, `receipt_date`
-  - Tambahan logic: `_get_sequence()`, `action_post()`, `button_cancel_commercial_invoice()`
+1. Pastikan `purchase`, `account`, dan `cke_vendor_child` sudah tersedia.
+2. Jalankan upgrade:
 
-- `models/purchase_order.py`:
-  - Perhitungan: `amount_residual`, `payment_progress`, `advance_payment_status`
+::
 
-- `wizard/purchase_advance_payment_wizard.py`:
-  - Gabungan `check_amount()`
-  - Ganti `child_contact_id` menjadi `display_child_name`
+    odoo-bin -u purchase_advance_payment -d nama_database
 
-- `wizard/vendor_bill_advance_payment_wizard.py`:
-  - Validasi advance payment vendor bill
+3. Uji alur:
+   - Buat PO > Pay Advance > Receipt > Vendor Bill
+   - Validasi sebagai **Commercial Invoice**
+   - Klik **Explode Packs** (jika aktif), cek PO Reference
 
-- `report/purchase_payment_progress_report.py`: _(baru)_
-  - Logic untuk generate report XLSX dari purchase.order
+-------------------------------------------------------
+Informasi
+=========
 
-### XML
-- `views/account_move_commercial_invoice_view.xml`
-  - Tombol `Validate` & `Cancel Commercial Invoice`
-  - Tambahan tab *Payment Advances*
-
-- `views/account_move_tree_view.xml`
-  - Badge untuk `commercial_invoice`, `cancel`
-
-- `views/purchase_view.xml`
-  - Tombol `Pay TT`, tab advance payment di PO
-
-- `views/account_move_payment_advances.xml`: _(baru)_
-  - Tab *Payment Advances* di vendor bill
-
-- `views/report/purchase_payment_progress_report_view.xml`: _(baru)_
-  - View dan menu untuk export XLSX
-
-### Data
-- `data/ir_sequence.xml`: _(baru)_
-  - Sequence `custom.commercial.invoice`
-
----
-
-## 📥 Instalasi
-
-1. Pastikan dependensi `account`, `purchase`, dan `cke_vendor_child` sudah tersedia.
-2. Pasang modul ini melalui Apps, atau upgrade jika sudah terpasang.
-3. Akses melalui:
-   - **Purchase Order**: tombol "Pay TT"
-   - **Vendor Bill**: tombol "Pay Advance"
-   - **Menu Purchase > Export Payment Progress**
-
----
-
-## 📌 Catatan
-- Modul ini sepenuhnya kompatibel dengan Odoo 14.0 EE.
-- Disarankan untuk digunakan oleh user dengan akses grup: `Purchase User` dan `Account Invoice`.
+- Author: PT Industrial Multi Fan
+- Maintainer: aRai
+- Website: https://kipascke.co.id
+- License: AGPL-3 (purchase_advance_payment), LGPL-3 (product_bundle_pack)
