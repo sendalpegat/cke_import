@@ -1,104 +1,77 @@
 Product Bundle Pack
 ===================
 
-Modul Odoo 14.0 ini memungkinkan Anda membuat produk dalam bentuk **bundle/pack** 
-(yaitu kombinasi dari beberapa produk menjadi satu item), yang bisa digunakan pada 
-pembelian, penjualan, receipt, dan vendor bill. Disediakan juga fitur untuk 
-**meledakkan bundle menjadi komponen** saat membuat tagihan.
+Modul Odoo 14.0 untuk mendukung pengelolaan produk dalam bentuk *bundle* atau *pack* 
+yang terdiri dari beberapa komponen produk. Modul ini memperluas alur purchase, stock, 
+dan invoice dengan logika pembongkaran (*explode*) dan pelacakan relasi ke PO.
 
 -------------------------------------------------------
 Fitur Utama
 ===========
 
-🧩 Product Bundle (Pack)
+🧩 Product Pack / Bundle
 ------------------------
-- Aktifkan `Is Product Pack` pada product template untuk mengubah produk menjadi bundle.
-- Tambahkan komponen di tab **Pack Products**.
-- Centang `Calculate Pack Price` agar harga pokok otomatis dihitung dari semua komponen.
+- Tambahkan produk baru, aktifkan `Is Product Pack` pada template.
+- Di tab *Pack Products*, isi komponen produk dan quantity-nya.
+- Jika `Calculate Pack Price` dicentang, maka harga jual atau beli otomatis berasal dari total harga komponen.
 
 📦 Integrasi dengan Purchase Order
----------------------------------
-- Produk bundle dapat dipilih di Purchase Order seperti biasa.
-- Akan muncul tab **Pack Products** untuk melihat rincian komponen.
-- Saat receipt, Odoo akan membuat `stock.move` terpisah untuk setiap komponen.
+----------------------------------
+- Produk pack dapat dibeli dalam PO seperti produk biasa.
+- Saat PO dikonfirmasi dan dilakukan receipt, komponen pack akan di-*explode* otomatis ke `stock.move`.
 
-🧾 Vendor Bill + Explode Pack
------------------------------
-- Pada vendor bill (`account.move` dengan `move_type='in_invoice'`), tersedia tombol **Explode Packs**.
-- Tombol ini membuka wizard `explode.pack.wizard`.
-- Saat tombol Confirm and Replace ditekan:
-  
-  * Semua invoice line dari produk bundle dihapus.
-  * Komponen produk akan ditambahkan sebagai invoice line baru.
-  * Nama produk komponen otomatis disertai **nomor PO**, contoh:
+🧾 Vendor Bill & Explode Pack Wizard
+------------------------------------
+- Saat membuat vendor bill, jika ada produk pack, tombol **Explode Packs** akan tersedia.
+- Tombol ini akan:
+  * Menghapus invoice line yang berupa pack
+  * Menambahkan invoice line baru berdasarkan komponen pack
+  * Menampilkan `PO Reference` secara otomatis di sebelah nama produk (misal: `[PO04532] Motor Fan 1/2HP`)
 
-    ::
+📄 PO Reference Otomatis di Invoice
+-----------------------------------
+- Field baru `purchase_order_ref` muncul di `account.move.line`
+- Diambil otomatis dari `move_id.purchase_id.name`
+- Kini tetap muncul meskipun invoice berstatus `commercial_invoice`
 
-        [PO12345] Motor Fan 14"
-
-📄 PO Reference di Invoice Line
--------------------------------
-- Field baru `PO Reference` (`purchase_order_ref`) ditambahkan ke model `account.move.line`.
-- Nilai ini otomatis diisi dari `move_id.purchase_id.name`.
-- Ditampilkan pada tree view invoice lines di form vendor bill.
-- Field ini juga tersedia saat **export Excel**.
-
--------------------------------------------------------
-Konfigurasi
-===========
-
-Pengaturan Bundle
------------------
-Masuk ke:
-
-::
-
-    Settings > Purchase > Allow Bundle Pack on Purchase
-
-Centang opsi ini untuk mengaktifkan dukungan produk bundle pada proses pembelian.
+📊 Statinfo Vendor Bills Tetap Muncul
+-------------------------------------
+- Field baru `purchase_id` ditambahkan ke `account.move`
+- Field `invoice_ids` ditambahkan ke `purchase.order` untuk melacak vendor bill secara langsung
+- Widget **statinfo "Vendor Bills"** di `purchase.order` akan selalu tampil (baik status `posted` maupun `commercial_invoice`)
+- Tombol "Vendor Bills" akan membuka daftar invoice yang terkait PO tersebut
 
 -------------------------------------------------------
-Struktur Tambahan
-=================
+Integrasi
+=========
 
-+-------------------------------+------------------------------------------------+
-| File                         | Penjelasan                                     |
-+===============================+================================================+
-| models/account_move_line.py  | Field `purchase_order_ref` (related ke PO)     |
-+-------------------------------+------------------------------------------------+
-| views/account_move_line_view.xml | View yang menampilkan field di invoice lines |
-+-------------------------------+------------------------------------------------+
-| wizard/explode_pack_wizard.py | Logika explode pack ke komponen + nama PO      |
-+-------------------------------+------------------------------------------------+
+✔ Kompatibel dengan modul `purchase_advance_payment`:
+- Mendukung status invoice `commercial_invoice`
+- Tidak membutuhkan dependensi langsung (decoupled)
+- PO Reference tetap terhubung
 
 -------------------------------------------------------
-Cara Upgrade
-============
+Instalasi
+=========
 
-1. Jalankan perintah upgrade modul:
+1. Salin modul ke folder addons Anda.
+2. Pastikan dependensi `purchase`, `product`, `account`, dan `stock` sudah tersedia.
+3. Jalankan upgrade:
 
 ::
 
     odoo-bin -u product_bundle_pack -d nama_database
 
-2. Coba alur:
-   * Buat produk bundle
-   * Buat Purchase Order
-   * Lakukan receipt
-   * Buat Vendor Bill
-   * Klik tombol **Explode Packs** dan lihat hasilnya
+4. Uji alur:
+   - Buat PO → pilih produk pack
+   - Terima produk (receipt) → create bill
+   - Gunakan tombol "Explode Packs" → cek invoice lines & PO
 
 -------------------------------------------------------
-Informasi Pengembang
-====================
+Informasi Tambahan
+==================
 
-* Author: PT Industrial Multi Fan
-* Maintainer: aRai
-* Website: https://kipascke.co.id
-* License: LGPL-3.0
-
--------------------------------------------------------
-Lisensi
-=======
-
-This module is licensed under the LGPL-3.0 License.
+- Author: PT Industrial Multi Fan
+- Maintainer: aRai
+- Website: https://kipascke.co.id
+- License: LGPL-3

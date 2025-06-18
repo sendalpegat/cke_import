@@ -1,7 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
-
 class ExplodePackWizard(models.TransientModel):
     _name = 'explode.pack.wizard'
     _description = 'Explode Product Pack to Components'
@@ -44,28 +43,18 @@ class ExplodePackWizard(models.TransientModel):
     def button_confirm(self):
         self.ensure_one()
         move = self.move_id
+        order_ref = move.purchase_id.name  # Ambil referensi PO
 
-        # 🛠️ Coba cari purchase dari invoice_origin jika belum dihubungkan
-        if not move.purchase_id and move.invoice_origin:
-            po = self.env['purchase.order'].search([('name', '=', move.invoice_origin)], limit=1)
-            if po:
-                move.purchase_id = po
-
-        # 🛡️ Pastikan invoice_origin tetap terisi
-        if not move.invoice_origin and move.purchase_id:
-            move.invoice_origin = move.purchase_id.name
-
-        order_ref = move.purchase_id.name if move.purchase_id else False
-
-        # 🔥 Hapus baris bundle
+        # Hapus invoice line pack
         lines_to_remove = move.invoice_line_ids.filtered(lambda l: l.product_id.product_tmpl_id.is_pack)
         lines_to_remove.unlink()
 
-        # ➕ Tambahkan komponen baru
+        # Tambahkan komponen baru
         for line in self.line_ids:
             self.env['account.move.line'].create({
                 'move_id': move.id,
                 'product_id': line.product_id.id,
+        
                 'quantity': line.qty_uom,
                 'price_unit': line.price_unit,
                 'account_id': line.account_id.id,
@@ -80,6 +69,7 @@ class ExplodePackWizard(models.TransientModel):
             'target': 'current',
         }
 
+
 class ExplodePackLine(models.TransientModel):
     _name = 'explode.pack.line'
     _description = 'Pack Component Line'
@@ -90,6 +80,7 @@ class ExplodePackLine(models.TransientModel):
     price_unit = fields.Float("Cost", required=True)
     account_id = fields.Many2one('account.account', string="Expense Account", required=True)
     description = fields.Char("Description")
+
 
 # OPTIONAL: Inject button into account.move via product_bundle_pack
 class AccountMove(models.Model):

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="backup_form_view" model="ir.ui.view">
+            <field name="name">db.backup.form.view</field>
+            <field name="model">db.backup</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Back-up form view">
+                    <sheet>
+                        <group>
+                            <group name="config_backup" string="Local Backup">
+                                <field name="host_name" colspan="2"/>
+                                <field name="name"/>
+                                <field name="port_number"/>
+                                <field name="backup_type"/>
+                                <field name="folder"/>
+                            </group>
+                            <group name="config_google" string="Google Drive Upload">
+                                <field name="gdrive_upload"/>
+                                <field name="drive_folder_id"
+                                       attrs="{'invisible':[('gdrive_upload', '=', False)],'required':[('gdrive_upload', '=', True)]}"/>
+                                <field name="gdrive_email_notification_ids"
+                                       attrs="{'invisible':[('gdrive_upload', '=', False)],'required':[('gdrive_upload', '=', True)]}"
+                                       widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_backup_config_tree" model="ir.ui.view">
+            <field name="name">db.backup.tree</field>
+            <field name="model">db.backup</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Backups">
+                    <field name='host_name'/>
+                    <field name='port_number'/>
+                    <field name='name'/>
+                    <field name='folder'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_backup" model="ir.actions.act_window">
+            <field name="name">Configure Backups</field>
+            <field name="res_model">db.backup</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_backup_config_tree"/>
+        </record>
+
+        <menuitem id="auto_backup_menu" name="Backup" parent="base.menu_custom"/>
+        <menuitem parent="auto_backup_menu" action="action_backup" id="backup_conf_menu"/>
+    </data>
+</odoo>

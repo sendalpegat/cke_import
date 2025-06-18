@@ -1,0 +1,12 @@
+from odoo import models, fields, api
+
+class ExplodedPackComponent(models.Model):
+    _name = 'exploded.pack.component'
+    _description = 'Exploded Pack Component Tracker'
+
+    move_id = fields.Many2one('account.move', string="Vendor Bill", required=True)
+    product_id = fields.Many2one('product.product', string="Component", required=True)
+    pack_product_id = fields.Many2one('product.product', string="Bundle Product")
+    exploded = fields.Boolean(string="Exploded", default=False)
+    quantity = fields.Float("Quantity")
+    pack_id = fields.Many2one('product.pack', string="Pack Component")
