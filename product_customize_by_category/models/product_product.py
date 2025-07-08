@@ -209,3 +209,16 @@ class ProductProduct(models.Model):
     cable_field_summary = fields.Char(string="Cable", related='product_tmpl_id.cable_field_summary', store=True)
     color_field_summary = fields.Char(string="Color", related='product_tmpl_id.color_field_summary', store=True)
     # packing_field_summary = fields.Char(string="Packing Summary", related='product_tmpl_id.packing_field_summary', store=True)
+
+    def action_unlock_custom_fields(self):
+        for rec in self:
+            rec.is_locked = False
+            all_field_lines = (
+                rec.spec_field_values +
+                rec.material_field_values +
+                rec.cable_field_values +
+                rec.color_field_values
+            )
+            for field_val in all_field_lines:
+                field_val.is_locked = False
+        return True

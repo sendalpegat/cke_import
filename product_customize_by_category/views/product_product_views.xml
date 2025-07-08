@@ -8,6 +8,11 @@
             <xpath expr="//notebook" position="inside">
                 <page string="Categories Template">
                     <group>
+                        <button name="action_unlock_custom_fields"
+                                type="object"
+                                string="Unlock Values"
+                                class="oe_highlight"
+                                attrs="{'invisible': [('is_locked','=',False)]}"/>
                         <field name="spec_field_values">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>

@@ -387,6 +387,21 @@ class ProductTemplate(models.Model):
             template.cable_field_summary = ", ".join(cable_summary) if cable_summary else ""
             template.color_field_summary = ", ".join(color_summary) if color_summary else ""
 
+    def action_unlock_custom_fields(self):
+        """Unlock all custom field values so they can be edited again."""
+        for rec in self:
+            rec.is_locked = False
+            # Unlock semua custom field values
+            all_field_lines = (
+                rec.spec_field_values +
+                rec.material_field_values +
+                rec.cable_field_values +
+                rec.color_field_values
+            )
+            for field_val in all_field_lines:
+                field_val.is_locked = False
+        return True
+
 class ProductTemplateFieldValue(models.Model):
     _name = 'product.template.field.value'
     _description = 'Product Template Value'
