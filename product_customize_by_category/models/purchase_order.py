@@ -51,52 +51,53 @@ class PurchaseOrder(models.Model):
         di product.template dan product.product yang terkait di order_line.
         """
         for order in self:
-            for line in order.order_line:
-                template = line.product_id.product_tmpl_id
-                variant = line.product_id
-                if not template or not variant:
-                    continue
+            if order.state in ['draft', 'sent']:  # Sesuaikan kondisi sesuai kebutuhan
+                for line in order.order_line:
+                    template = line.product_id.product_tmpl_id
+                    variant = line.product_id
+                    if not template or not variant:
+                        continue
 
-                # 1. Lock semua field dynamic (One2many) yang sudah diaktifkan
-                # Tambahkan sesuai group field yang kamu gunakan
-                dynamic_fields = [
-                    'spec_field_values',
-                    # 'motor_field_values',
-                    # 'bearing_field_values',
-                    # 'kss_field_values',
-                    # 'cablespeed_field_values',
-                    # 'remote_field_values',
-                    # 'tou_field_values',
-                    # 'led_field_values',
-                    # 'book_field_values',
-                    'material_field_values',
-                    'cable_field_values',
-                    'color_field_values',
-                ]
-                for field in dynamic_fields:
-                    getattr(template, field).write({'is_locked': True})
-                    getattr(variant, field).write({'is_locked': True})
+                    # 1. Lock semua field dynamic (One2many) yang sudah diaktifkan
+                    # Tambahkan sesuai group field yang kamu gunakan
+                    dynamic_fields = [
+                        'spec_field_values',
+                        # 'motor_field_values',
+                        # 'bearing_field_values',
+                        # 'kss_field_values',
+                        # 'cablespeed_field_values',
+                        # 'remote_field_values',
+                        # 'tou_field_values',
+                        # 'led_field_values',
+                        # 'book_field_values',
+                        'material_field_values',
+                        'cable_field_values',
+                        'color_field_values',
+                    ]
+                    for field in dynamic_fields:
+                        getattr(template, field).write({'is_locked': True})
+                        getattr(variant, field).write({'is_locked': True})
 
-                # 2. Lock field selection
-                selection_fields = [
-                    'motor_type',
-                    'bearing_type',
-                    'knob_switch_speed',
-                    'cable_speed',
-                    'remote_control',
-                    'tou',
-                    'led',
-                    'manual_book',
-                ]
-                vals_selection = {}
-                for field in selection_fields:
-                    # Sync value dari template ke variant, lalu lock
-                    if hasattr(template, field):
-                        value = getattr(template, field)
-                        vals_selection[field] = value
-                vals_selection['is_locked'] = True
+                    # 2. Lock field selection
+                    selection_fields = [
+                        'motor_type',
+                        'bearing_type',
+                        'knob_switch_speed',
+                        'cable_speed',
+                        'remote_control',
+                        'tou',
+                        'led',
+                        'manual_book',
+                    ]
+                    vals_selection = {}
+                    for field in selection_fields:
+                        # Sync value dari template ke variant, lalu lock
+                        if hasattr(template, field):
+                            value = getattr(template, field)
+                            vals_selection[field] = value
+                    vals_selection['is_locked'] = True
 
-                template.write(vals_selection)
-                variant.write(vals_selection)
+                    template.write(vals_selection)
+                    variant.write(vals_selection)
 
-        return super(PurchaseOrder, self).button_confirm()
+            return super(PurchaseOrder, self).button_confirm()
