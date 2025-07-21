@@ -93,6 +93,33 @@ class ProductProduct(models.Model):
         store=True
     )
 
+    def _sync_from_template(self):
+        """Sinkronkan nilai dari template ke variant"""
+        for product in self:
+            if product.product_tmpl_id:
+                # Ambil semua nilai dari template
+                template_values = self.env['product.template.field.value'].search([
+                    ('product_id', '=', product.product_tmpl_id.id)
+                ])
+
+                for tval in template_values:
+                    # Cari atau buat record yang sesuai di variant
+                    existing_value = self.env['product.template.field.value'].search([
+                        ('field_definition_id', '=', tval.field_definition_id.id),
+                        ('product_product_id', '=', product.id),
+                        ('field_type', '=', tval.field_type)
+                    ], limit=1)
+
+                    if existing_value:
+                        existing_value.write({'value': tval.value})
+                    else:
+                        self.env['product.template.field.value'].create({
+                            'field_definition_id': tval.field_definition_id.id,
+                            'product_product_id': product.id,
+                            'field_type': tval.field_type,
+                            'value': tval.value
+                        })
+
     @api.depends(
         'spec_field_values', 'spec_field_values.value',
         'material_field_values', 'material_field_values.value',
@@ -150,33 +177,6 @@ class ProductProduct(models.Model):
         if 'product_tmpl_id' in vals:
             product._sync_from_template()
         return product
-
-    def _sync_from_template(self):
-        """Sinkronkan nilai dari template ke variant"""
-        for product in self:
-            if product.product_tmpl_id:
-                # Ambil semua nilai dari template
-                template_values = self.env['product.template.field.value'].search([
-                    ('product_id', '=', product.product_tmpl_id.id)
-                ])
-
-                for tval in template_values:
-                    # Cari atau buat record yang sesuai di variant
-                    existing_value = self.env['product.template.field.value'].search([
-                        ('field_definition_id', '=', tval.field_definition_id.id),
-                        ('product_product_id', '=', product.id),
-                        ('field_type', '=', tval.field_type)
-                    ], limit=1)
-
-                    if existing_value:
-                        existing_value.write({'value': tval.value})
-                    else:
-                        self.env['product.template.field.value'].create({
-                            'field_definition_id': tval.field_definition_id.id,
-                            'product_product_id': product.id,
-                            'field_type': tval.field_type,
-                            'value': tval.value
-                        })
 
     def update_from_template(self):
         """Update variant dengan nilai dari template"""
