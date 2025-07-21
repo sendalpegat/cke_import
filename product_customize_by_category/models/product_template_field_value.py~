@@ -1,0 +1,96 @@
+from odoo import models, fields, api
+
+class ProductTemplateFieldValue(models.Model):
+    _name = 'product.template.field.value'
+    _description = 'Product Template Value'
+    _order = 'sequence, id'
+
+    field_definition_id = fields.Many2one(
+        'product.category.field.definition',
+        string='Definition',
+        required=True,
+        ondelete='cascade'
+    )
+    name = fields.Char(
+        string='Name',
+        related='field_definition_id.name',
+        readonly=True,
+        store=True
+    )
+    sequence = fields.Integer(
+        string='Sequence',
+        related='field_definition_id.sequence',
+        readonly=True,
+        store=True
+    )
+    field_type = fields.Selection([
+        ('spec', 'Specification'),
+        ('material', 'Material'),
+        ('cable', 'Cable'),
+        ('color', 'Color'),
+        ('option', 'Option Selection'),
+    ], string='Field Type', required=True)
+    value = fields.Char(string='Value')
+    value_selection = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No')
+    ], string='Selection Value')
+    original_value = fields.Char(string='Last Value', copy=True)
+    is_locked = fields.Boolean(string='Locked', default=False,
+                             help="If checked, value cannot be changed when used in PO")
+    product_id = fields.Many2one(
+        'product.template',
+        string='Product',
+        ondelete='cascade'
+    )
+    product_product_id = fields.Many2one(
+        'product.product',
+        string='Product Variant',
+        ondelete='cascade'
+    )
+
+    def write(self, vals):
+        if 'value' in vals or 'value_selection' in vals:
+            for rec in self:
+                if rec.is_locked:
+                    vals['original_value'] = vals.get('value', rec.value)
+                    if rec.field_type == 'option':
+                        vals['value_selection'] = rec.value_selection
+                    else:
+                        vals['value'] = rec.value
+        res = super(ProductTemplateFieldValue, self).write(vals)
+        if 'value' in vals or 'value_selection' in vals:
+            self._sync_to_variants()
+        return res
+
+    @api.model
+    def create(self, vals):
+        record = super(ProductTemplateFieldValue, self).create(vals)
+        record._sync_to_variants()
+        return record
+
+    def _sync_to_variants(self):
+        for record in self:
+            if record.product_id:
+                variants = self.env['product.product'].search([
+                    ('product_tmpl_id', '=', record.product_id.id)
+                ])
+                for variant in variants:
+                    existing_value = self.search([
+                        ('field_definition_id', '=', record.field_definition_id.id),
+                        ('product_product_id', '=', variant.id),
+                        ('field_type', '=', record.field_type)
+                    ], limit=1)
+                    values = {
+                        'field_definition_id': record.field_definition_id.id,
+                        'product_product_id': variant.id,
+                        'field_type': record.field_type,
+                    }
+                    if record.field_type == 'option':
+                        values['value_selection'] = record.value_selection
+                    else:
+                        values['value'] = record.value
+                    if existing_value:
+                        existing_value.write(values)
+                    else:
+                        self.create(values)

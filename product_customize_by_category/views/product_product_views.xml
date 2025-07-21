@@ -1,4 +1,3 @@
-<!-- views/product_product_views.xml -->
 <odoo>
     <record id="view_product_product_form_inherit" model="ir.ui.view">
         <field name="name">product.product.form.inherit</field>
@@ -8,11 +7,6 @@
             <xpath expr="//notebook" position="inside">
                 <page string="Categories Template">
                     <group>
-                        <button name="action_unlock_custom_fields"
-                                type="object"
-                                string="Unlock Values"
-                                class="oe_highlight"
-                                attrs="{'invisible': [('is_locked','=',False)]}"/>
                         <field name="spec_field_values">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
@@ -23,6 +17,7 @@
                             </tree>
                         </field>
 
+                        <!-- Field summary akan otomatis compute dari variant -->
                         <field name="spec_field_summary" readonly="1"/>
 
                         <field name="motor_type" attrs="{'readonly': [('is_locked', '=', True)]}"/>
@@ -34,102 +29,6 @@
                         <field name="led" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                         <field name="manual_book" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                         <field name="is_locked" invisible="1"/>
-
-                        <!-- <field name="motor_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="motor_field_summary" readonly="1"/>
-
-                        <field name="bearing_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="bearing_field_summary" readonly="1"/>
-
-                        <field name="kss_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="kss_field_summary" readonly="1"/>
-
-                        <field name="cablespeed_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="cablespeed_field_summary" readonly="1"/>
-
-                        <field name="remote_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="remote_field_summary" readonly="1"/>
-
-                        <field name="tou_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="tou_field_summary" readonly="1"/>
-
-                        <field name="led_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="led_field_summary" readonly="1"/>
-
-                        <field name="book_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="book_field_summary" readonly="1"/> -->
 
                         <field name="material_field_values">
                             <tree editable="bottom">
@@ -166,18 +65,6 @@
                         </field>
 
                         <field name="color_field_summary" readonly="1"/>
-
-<!--                         <field name="packing_field_values">
-                            <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                                <field name="original_value" string="Original Value" readonly="1"/>
-                                <field name="is_locked" invisible="1"/>
-                            </tree>
-                        </field>
-
-                        <field name="packing_field_summary" readonly="1"/> -->
                     </group>
                 </page>
             </xpath>

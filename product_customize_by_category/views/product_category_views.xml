@@ -14,70 +14,6 @@
                         </tree>
                     </field>
 
-                    <!-- <field name="motor_field_ids" context="{'default_field_type': 'motor'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name" default="Motor Type"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="bearing_field_ids" context="{'default_field_type': 'bearing'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="kss_field_ids" context="{'default_field_type': 'kss'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="cablespeed_field_ids" context="{'default_field_type': 'cablespeed'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="remote_field_ids" context="{'default_field_type': 'remote'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="tou_field_ids" context="{'default_field_type': 'tou'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="led_field_ids" context="{'default_field_type': 'led'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field>
-
-                    <field name="book_field_ids" context="{'default_field_type': 'book'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field> -->
-
                     <field name="material_field_ids" context="{'default_field_type': 'material'}">
                         <tree editable="bottom">
                             <field name="sequence" widget="handle"/>
@@ -101,14 +37,6 @@
                             <field name="field_type" invisible="1"/>
                         </tree>
                     </field>
-
-<!--                     <field name="packing_field_ids" context="{'default_field_type': 'packing'}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle"/>
-                            <field name="name"/>
-                            <field name="field_type" invisible="1"/>
-                        </tree>
-                    </field> -->
                 </group>
             </xpath>
         </field>

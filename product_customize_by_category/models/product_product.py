@@ -10,62 +10,6 @@ class ProductProduct(models.Model):
         domain=[('field_type', '=', 'spec')]
     )
 
-    # motor_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Motor Type',
-    #     domain=[('field_type', '=', 'motor')]
-    # )
-
-    # bearing_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Bearing Type',
-    #     domain=[('field_type', '=', 'bearing')]
-    # )
-
-    # kss_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Knob Switch Speed',
-    #     domain=[('field_type', '=', 'kss')]
-    # )
-
-    # cablespeed_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Cable Speed',
-    #     domain=[('field_type', '=', 'cablespeed')]
-    # )
-
-    # remote_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Remote Control',
-    #     domain=[('field_type', '=', 'remote')]
-    # )
-
-    # tou_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Therm of Use',
-    #     domain=[('field_type', '=', 'tou')]
-    # )
-
-    # led_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='LED',
-    #     domain=[('field_type', '=', 'led')]
-    # )
-
-    # book_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Manual Book',
-    #     domain=[('field_type', '=', 'book')]
-    # )
-
     material_field_values = fields.One2many(
         'product.template.field.value',
         'product_product_id',
@@ -109,8 +53,8 @@ class ProductProduct(models.Model):
     )
 
     tou = fields.Selection(
-        [('yes', 'Yes - Reset Thermal Protector'), ('no', 'No')],
-        string='Thermofuse',
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Therm of Use',
         default='no'
     )
 
@@ -128,34 +72,77 @@ class ProductProduct(models.Model):
 
     is_locked = fields.Boolean(string='Locked', default=False)  # <-- Tambahkan ini
 
-    # packing_field_values = fields.One2many(
-    #     'product.template.field.value',
-    #     'product_product_id',
-    #     string='Packing Method',
-    #     domain=[('field_type', '=', 'packing')]
-    # )
-
-    # Kembalikan field summary sebagai related ke template
     spec_field_summary = fields.Char(
-        string="Specification Summary", 
-        related='product_tmpl_id.spec_field_summary', 
+        string="Specification Summary",
+        compute="_compute_field_summaries",
         store=True
     )
     material_field_summary = fields.Char(
-        string="Material Summary", 
-        related='product_tmpl_id.material_field_summary', 
+        string="Material Summary",
+        compute="_compute_field_summaries",
         store=True
     )
     cable_field_summary = fields.Char(
-        string="Cable Summary", 
-        related='product_tmpl_id.cable_field_summary', 
+        string="Cable Summary",
+        compute="_compute_field_summaries",
         store=True
     )
     color_field_summary = fields.Char(
-        string="Color Summary", 
-        related='product_tmpl_id.color_field_summary', 
+        string="Color Summary",
+        compute="_compute_field_summaries",
         store=True
     )
+
+    @api.depends(
+        'spec_field_values', 'spec_field_values.value',
+        'material_field_values', 'material_field_values.value',
+        'cable_field_values', 'cable_field_values.value',
+        'color_field_values', 'color_field_values.value',
+    )
+    def _compute_field_summaries(self):
+        for variant in self:
+            # Specification
+            spec_summary = [
+                f"{field.name}: {field.value}" 
+                for field in variant.spec_field_values 
+                if field.value and field.value.strip()
+            ]
+            variant.spec_field_summary = ", ".join(spec_summary) if spec_summary else ""
+
+            material_summary = [
+                f"{field.name}: {field.value}" 
+                for field in variant.material_field_values 
+                if field.value and field.value.strip()
+            ]
+            variant.material_field_summary = ", ".join(material_summary) if material_summary else ""
+
+            cable_summary = [
+                f"{field.name}: {field.value}" 
+                for field in variant.cable_field_values 
+                if field.value and field.value.strip()
+            ]
+            variant.cable_field_summary = ", ".join(cable_summary) if cable_summary else ""
+
+            color_summary = [
+                f"{field.name}: {field.value}" 
+                for field in variant.color_field_values 
+                if field.value and field.value.strip()
+            ]
+            variant.color_field_summary = ", ".join(color_summary) if color_summary else ""
+
+
+    def action_sync_variant_fields(self):
+        self.update_all_variants()
+        # Optional: message popup
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': ('Sync Complete'),
+                'message': ('All variant fields updated from template.'),
+                'sticky': False,
+            }
+        }
 
     @api.model
     def create(self, vals):
@@ -196,29 +183,6 @@ class ProductProduct(models.Model):
         self._sync_from_template()
         return True
 
-    spec_field_summary = fields.Char(string="Specification Summary", related='product_tmpl_id.spec_field_summary', store=True)
-    # motor_field_summary = fields.Char(string="Motor Summary", related='product_tmpl_id.motor_field_summary', store=True)
-    # bearing_field_summary = fields.Char(string="Bearing Summary", related='product_tmpl_id.bearing_field_summary', store=True)
-    # kss_field_summary = fields.Char(string="KSS Summary", related='product_tmpl_id.kss_field_summary', store=True)
-    # cablespeed_field_summary = fields.Char(string="Cable Speed Summary", related='product_tmpl_id.cablespeed_field_summary', store=True)
-    # remote_field_summary = fields.Char(string="Remote Summary", related='product_tmpl_id.remote_field_summary', store=True)
-    # tou_field_summary = fields.Char(string="Tou Summary", related='product_tmpl_id.tou_field_summary', store=True)
-    # led_field_summary = fields.Char(string="Motor Summary", related='product_tmpl_id.led_field_summary', store=True)
-    # book_field_summary = fields.Char(string="Book Summary", related='product_tmpl_id.book_field_summary', store=True)
-    material_field_summary = fields.Char(string="Material", related='product_tmpl_id.material_field_summary', store=True)
-    cable_field_summary = fields.Char(string="Cable", related='product_tmpl_id.cable_field_summary', store=True)
-    color_field_summary = fields.Char(string="Color", related='product_tmpl_id.color_field_summary', store=True)
-    # packing_field_summary = fields.Char(string="Packing Summary", related='product_tmpl_id.packing_field_summary', store=True)
-
-    def action_unlock_custom_fields(self):
-        for rec in self:
-            rec.is_locked = False
-            all_field_lines = (
-                rec.spec_field_values +
-                rec.material_field_values +
-                rec.cable_field_values +
-                rec.color_field_values
-            )
-            for field_val in all_field_lines:
-                field_val.is_locked = False
-        return True
+    # spec_field_summary = fields.Char(string="Specification Summary", related='product_tmpl_id.spec_field_summary', store=True)
+    # cable_field_summary = fields.Char(string="Cable", related='product_tmpl_id.cable_field_summary', store=True)
+    # color_field_summary = fields.Char(string="Color", related='product_tmpl_id.color_field_summary', store=True)
