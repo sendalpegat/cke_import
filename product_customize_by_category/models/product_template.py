@@ -72,6 +72,13 @@ class ProductTemplate(models.Model):
 
     is_locked = fields.Boolean(string='Locked', default=False)  # <-- Tambahkan ini
 
+    def update_all_variants(self):
+        """Update semua variant dengan nilai dari template"""
+        for template in self:
+            for variant in template.product_variant_ids:
+                variant._sync_from_template()
+        return True
+
     def action_sync_variant_fields(self):
         self.update_all_variants()
         # Optional: message popup
@@ -161,12 +168,6 @@ class ProductTemplate(models.Model):
             variant_values_to_remove.unlink()
         to_remove.unlink()
 
-    def update_all_variants(self):
-        """Update semua variant dengan nilai dari template"""
-        for template in self:
-            for variant in template.product_variant_ids:
-                variant._sync_from_template()
-        return True
 
 # Field Summary untuk Semua Grup
     spec_field_summary = fields.Char(string="Specification Summary", compute="_compute_field_summaries", store=True)
