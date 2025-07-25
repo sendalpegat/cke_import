@@ -6,28 +6,40 @@ class ProductTemplate(models.Model):
 
     @api.model
     def load(self, fields, data):
-        # Cari index kolom default_code di import
         try:
             default_code_idx = fields.index('default_code')
         except ValueError:
-            # Tidak ada kolom default_code, lanjut import biasa
             return super(ProductTemplate, self).load(fields, data)
 
-        # Kumpulkan semua default_code yang di-import
-        import_codes = [row[default_code_idx] for row in data if row[default_code_idx]]
-        import_codes = list(set(import_codes))  # Hilangkan duplikat di list import
+        id_idx = None
+        if 'id' in fields:
+            id_idx = fields.index('id')
 
-        # Cek ke database apakah sudah ada
-        if import_codes:
-            # Cari ke product.product (bukan hanya template, agar lebih aman)
+        import_codes = {}
+        for row in data:
+            code = row[default_code_idx]
+            if code:
+                rec_id = row[id_idx] if id_idx is not None else False
+                import_codes[code] = rec_id
+
+        # Cari semua default_code yang di-import
+        check_codes = list(import_codes.keys())
+        if check_codes:
             ProductProduct = self.env['product.product'].with_context(active_test=False)
-            existing_products = ProductProduct.search([('default_code', 'in', import_codes)])
-            if existing_products:
-                dupe_codes = ', '.join(existing_products.mapped('default_code'))
+            existing_products = ProductProduct.search([('default_code', 'in', check_codes)])
+
+            # Cek duplikat: hanya blokir jika default_code ditemukan di product berbeda
+            dupe_codes = []
+            for prod in existing_products:
+                rec_id = import_codes.get(prod.default_code)
+                # rec_id bisa seperti 'product_template_XX', '1', dsb
+                if not rec_id or str(prod.product_tmpl_id.id) != str(rec_id):
+                    dupe_codes.append(prod.default_code)
+
+            if dupe_codes:
                 raise UserError(_(
                     "Import dibatalkan!\n\nTerdapat default_code yang sudah pernah ada: %s\n"
                     "Mohon hapus/mengganti kode tersebut sebelum import."
-                ) % dupe_codes)
+                ) % ', '.join(dupe_codes))
 
-        # Lanjutkan import jika tidak ada duplikat
         return super(ProductTemplate, self).load(fields, data)
