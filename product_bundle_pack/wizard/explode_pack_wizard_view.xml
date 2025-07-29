@@ -11,6 +11,7 @@
                     </group>
                     <field name="line_ids">
                         <tree editable="bottom">
+                            <field name="selected" widget="boolean_toggle"/>
                             <field name="product_id"/>
                             <field name="qty_uom"/>
                             <field name="price_unit"/>

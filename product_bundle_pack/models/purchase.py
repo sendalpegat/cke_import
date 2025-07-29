@@ -379,7 +379,17 @@ class StockMoveInherit(models.Model):
 	_inherit = 'stock.move'
 
 	pack_id = fields.Many2one('product.pack',string="PACK")
-	
+
+	# purchase_order_ref = fields.Char(
+    #     string='PO Reference',
+    #     compute='_compute_purchase_order_ref',
+    #     store=True
+    # )
+
+	# @api.depends('origin')
+	# def _compute_purchase_order_ref(self):
+	# 	for move in self:
+	# 		move.purchase_order_ref = move.origin
 
 class StockMoveLineInherit(models.Model):
 	_inherit = 'stock.move.line'

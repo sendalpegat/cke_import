@@ -5,19 +5,39 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 from odoo import SUPERUSER_ID
 
 
-class ProductPack(models.Model):
-	_name = 'product.pack'
-	_description = "Product Pack"
+# class ProductPack(models.Model):
+# 	_name = 'product.pack'
+# 	_description = "Product Pack"
 	
-	product_id = fields.Many2one(comodel_name='product.product', string='Product', required=True)
-	default_code = fields.Char(related='product_id.default_code', string="Product Code", store=True)
-	standard_price = fields.Float(related='product_id.standard_price', string="Cost", store=True)
-	qty_uom = fields.Float(string='Quantity', required=True, default=1.0)
-	bi_product_template = fields.Many2one(comodel_name='product.template', string='Product pack')
-	bi_image = fields.Binary(related='product_id.image_1920', string='Image', store=True)
-	price = fields.Float(related='product_id.lst_price', string='Product Price')
-	uom_id = fields.Many2one(related='product_id.uom_id' , string="Unit of Measure", readonly="1")
-	name = fields.Char(related='product_id.name', readonly="1")
+# 	product_id = fields.Many2one(comodel_name='product.product', string='Product', required=True)
+# 	default_code = fields.Char(related='product_id.default_code', string="Product Code", store=True)
+# 	standard_price = fields.Float(related='product_id.standard_price', string="Cost", store=True)
+# 	qty_uom = fields.Float(string='Quantity', required=True, default=1.0)
+# 	bi_product_template = fields.Many2one(comodel_name='product.template', string='Product pack')
+# 	bi_image = fields.Binary(related='product_id.image_1920', string='Image', store=True)
+# 	price = fields.Float(related='product_id.lst_price', string='Product Price')
+# 	uom_id = fields.Many2one(related='product_id.uom_id' , string="Unit of Measure", readonly="1")
+# 	name = fields.Char(related='product_id.name', readonly="1")
+
+class ProductPack(models.Model):
+    _name = 'product.pack'
+    _description = "Product Pack"
+
+    product_id = fields.Many2one('product.product', string='Product', required=True)
+    default_code = fields.Char(string="Product Code")
+    name = fields.Char(string="Product Name")
+    standard_price = fields.Float(string="Cost")
+    qty_uom = fields.Float(string='Quantity', required=True, default=1.0)
+    uom_id = fields.Many2one(related='product_id.uom_id', string="Unit of Measure", readonly=True)
+    bi_product_template = fields.Many2one('product.template', string='Parent Product')
+    bi_image = fields.Binary(related='product_id.image_1920', string='Image', store=True)
+    price = fields.Float(related='product_id.lst_price', string='Product Price')
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        self.default_code = self.product_id.default_code
+        self.name = self.product_id.name
+        self.standard_price = self.product_id.standard_price
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
