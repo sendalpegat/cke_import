@@ -16,11 +16,11 @@
                                 <div class="container o_kanban_card_content">
                                     <div class="row" style="flex-wrap: nowrap;">
                                         <div class="col-xs-6 o_kanban_primary_left">
-                                            <!-- <div t-if="record.state.raw_value =='sale.order'" style="color:teal;margin-left: 30px;" name ="sale order">
+                                            <div t-if="record.state.raw_value =='sale.order'" style="color:teal;margin-left: 30px;" name ="sale order">
                                                 <left>
                                                     <i class="fa fa-shopping-cart fa-5x"/>
                                                 </left>
-                                            </div> -->
+                                            </div>
                                             <div t-if="record.state.raw_value =='purchase.order'" style="color:teal;margin-left: 30px;" name ="purchase order">
                                                 <left>
                                                     <i class="fa fa-credit-card-alt fa-5x"/>
@@ -38,15 +38,15 @@
                                             <!-- <div t-if="record.state.raw_value =='mrp.bom'" style="color:teal;margin-left: 30px;" name ="mrp bom">
                                                 <left><i class="fa fa-industry fa-5x"/>
                                                 </left>
-                                            </div>  -->                                     
+                                            </div>    -->                                   
                                             <div t-if="record.state.raw_value =='res.partner'" style="color:teal;margin-left: 30px;" name ="res partner">
                                                 <left><i class="fa fa-user fa-5x"/>
                                                 </left>
                                             </div>
-                                            <!-- <div t-if="record.state.raw_value =='product.pricelist'" style="color:teal;margin-left: 30px;" name ="product pricelist">
+                                            <div t-if="record.state.raw_value =='product.pricelist'" style="color:teal;margin-left: 30px;" name ="product pricelist">
                                                 <left><i class="fa fa-list fa-5x"/>
                                                 </left>
-                                            </div>    -->           
+                                            </div>              
                                             <div t-if="record.state.raw_value =='product.template'" style="color:teal;margin-left: 30px;" name ="product template">
                                                 <left><i class="fa fa-product-hunt fa-5x"/>
                                                 </left>
@@ -65,7 +65,7 @@
                                             </div> 
                                         </div>
                                         <div class="col-xs-6 o_kanban_primary_right" style="margin-left: 20%;" >
-                                            <!-- <div t-if="record.state.raw_value =='sale.order'">
+                                            <div t-if="record.state.raw_value =='sale.order'">
                                                 <a style="font-size: 20px;" name="%(action_sale_order_import_view)d" type="action">
                                                     <span class="o_value"><t t-esc="record.import_data.raw_value"/></span>
                                                     <span class="o_label">Sale</span>
@@ -74,7 +74,7 @@
                                                 <button class="btn btn-sm btn-primary" style="margin-top: 20%;" name="%(gen_sale_import_wizard)d" type="action">
                                                     <span class="o_label">Import Sales</span>
                                                 </button>                                           
-                                            </div> -->
+                                            </div>
 
                                             <div t-if="record.state.raw_value == 'purchase.order'">
                                                 <a  style="font-size: 20px;" name="%(action_purchase_order_import_view)d" type="action">
@@ -131,7 +131,7 @@
                                                 </button>
                                             </div>
 
-                                            <!-- <div t-if="record.state.raw_value =='product.pricelist'">
+                                            <div t-if="record.state.raw_value =='product.pricelist'">
                                                 <a  style="font-size: 20px;" name="%(action_pricelist_import_view)d" type="action">
                                                     <span class="o_value"><t t-esc="record.import_data.raw_value"/></span>
                                                     <span class="o_label">Pricelist</span>
@@ -140,7 +140,7 @@
                                                 <button class="btn btn-sm btn-primary"  style="margin-top: 20%;" name="%(action_import_sale_pricelist_wizard)d" type="action">
                                                     <span class="o_label">Import Pricelist</span>
                                                 </button>
-                                            </div> -->
+                                            </div>
                                             <div t-if="record.state.raw_value =='product.template'">
                                                 <a  style="font-size: 20px;" name="%(action_product_template_import_view)d" type="action">
                                                     <span class="o_value"><t t-esc="record.import_data.raw_value"/></span>
@@ -221,13 +221,13 @@
         sequence="12" 
         name="Import All in one Data"/>
 
-    <!-- <menuitem 
+    <menuitem 
         id="import_sale_dashboard_view" 
         action="gen_sale_import_wizard"
         parent="import_all_in_one_dashboard_view"
         sequence="2" 
         name="Import sale order"
-        groups="sales_team.group_sale_salesman,sales_team.group_sale_manager"/> -->
+        groups="sales_team.group_sale_salesman,sales_team.group_sale_manager"/>
 
     <menuitem 
         id="import_invoice_dashboard_view" 
@@ -244,12 +244,12 @@
         name="Import Customer Payment"/>
 
 
-    <!-- <menuitem 
+    <menuitem 
         id="import_BOM_dashboard_view" 
         action="bi_gen_bom_wizard_action"
         parent="import_all_in_one_dashboard_view"
         sequence="5" 
-        name="Import BOM"/> -->
+        name="Import BOM"/>
 
     <menuitem 
         id="import_partner_dashboard_view" 
@@ -267,12 +267,12 @@
         name="Import Picking"/>
 
 
-    <!-- <menuitem 
+    <menuitem 
         id="import_pricelist_dashboard_view" 
         action="action_import_sale_pricelist_wizard"
         parent="import_all_in_one_dashboard_view"
         sequence="8" 
-        name="Import Pricelist"/> -->
+        name="Import Pricelist"/>
         
     <menuitem 
         id="import_variant_dashboard_view" 

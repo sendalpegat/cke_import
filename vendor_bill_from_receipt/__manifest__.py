@@ -10,7 +10,9 @@
     'depends': ['stock', 'account', 'purchase'],
     'data': [
         'views/stock_picking_views.xml',
-        'views/purchase_order_views.xml'
+        'views/purchase_order_views.xml',
+        'views/stock_picking_po_ref_view.xml',
+        'views/account_move_line_view.xml',
         # 'views/account_move_views.xml',
     ],
     'installable': True,

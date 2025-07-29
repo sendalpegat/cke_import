@@ -141,12 +141,18 @@ class StockPicking(models.Model):
         if existing_invoice:
             raise UserError("A vendor bill has already been created for this receipt.")
 
+        purchase_order = False
+        if self.origin:
+            # self.origin biasanya nama PO
+            purchase_order = self.env['purchase.order'].search([('name', '=', self.origin)], limit=1)
+
         invoice_vals = {
             'partner_id': self.partner_id.id,
             'invoice_date': fields.Date.today(),
             'move_type': 'in_invoice',
             'invoice_origin': self.name,
             'invoice_line_ids': [],
+            'purchase_id': purchase_order.id if purchase_order else False,
         }
 
         for move in self.move_ids_without_package:

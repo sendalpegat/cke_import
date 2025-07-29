@@ -9,4 +9,4 @@ access_product_category_custom_field,access_product_category_custom_field,model_
 access_product_template_custom_field,access_product_template_custom_field,model_product_template_custom_field4,,1,1,1,1
 access_product_category_field_definition,product.category.field.definition,model_product_category_field_definition,,1,1,1,1
 access_product_template_field_value,product.template.field.value,model_product_template_field_value,base.group_user,1,1,1,1
-access_product_product_field_value,product.product.field.value,model_product_product_field_value,base.group_user,1,1,1,1  # Tambahkan ini
+access_product_product_field_value,product.product.field.value,model_product_product_field_value,base.group_user,1,1,1,1

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<!-- Open sale order view -->
-	<!-- <record id="action_sale_order_import_view" model="ir.actions.act_window">
+	<record id="action_sale_order_import_view" model="ir.actions.act_window">
 		<field name="name">Sale Order</field>
 		<field name="res_model">sale.order</field>
 		<field name="view_mode">tree,kanban,form</field>
@@ -16,7 +16,7 @@
 				
 			</p>
 		</field>
-	</record> -->
+	</record>
 
 	<!-- Open purchase order view -->
 	<record id="action_purchase_order_import_view" model="ir.actions.act_window">
@@ -73,7 +73,7 @@
 	</record>	
 
 	<!-- Open mrp view -->
-	<!-- <record id="action_mrp_import_view" model="ir.actions.act_window">
+<!-- 	<record id="action_mrp_import_view" model="ir.actions.act_window">
 		<field name="name">Bill Of material</field>
 		<field name="res_model">mrp.bom</field>
 		<field name="view_mode">tree,kanban,form</field>
@@ -125,7 +125,7 @@
 				
 			</p>
 		</field>
-	</record>
+	</record>	
 
 
 	<!-- Open template view -->

@@ -11,7 +11,7 @@
     'author': 'Your Name',
     'website': 'https://yourwebsite.com',
     'license': 'AGPL-3',
-    'depends': ['base', 'product', 'ssi_product'],
+    'depends': ['base', 'product'],
     'data': [
         'views/product_views.xml',
     ],

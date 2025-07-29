@@ -45,6 +45,10 @@
             <field name="target">new</field>
         </record>
 
+   <menuitem action="gen_inv_wizard"
+    id="gen_inv_wizard_import"
+     parent="stock.menu_stock_inventory_control" groups="stock.group_stock_user" sequence="31"/>
+
   </data>
 </odoo>
  

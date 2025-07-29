@@ -56,5 +56,28 @@
             </field>
         </record>
 
+        <!-- Hide price_unit in purchase order lines (tree) -->
+        <record id="purchase_order_line_tree_hide_cost" model="ir.ui.view">
+            <field name="name">purchase.order.line.tree.hide.cost</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_unit']" position="attributes">
+                    <attribute name="groups">hide_cost_price.view_cost_price</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Hide price_unit in PO form's order_line (one2many) -->
+        <record id="purchase_order_form_hide_cost" model="ir.ui.view">
+            <field name="name">purchase.order.form.hide.cost</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']//field[@name='price_unit']" position="attributes">
+                    <attribute name="groups">hide_cost_price.view_cost_price</attribute>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

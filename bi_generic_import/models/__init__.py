@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 
-# from . import sale
+from . import sale
 from . import account_invoice
 from . import purchase
 from . import stock
@@ -9,7 +9,7 @@ from . import product
 from . import partner
 from . import picking
 from . import payment
-# from . import import_order_lines
+from . import import_order_lines
 from . import import_po_lines
 from . import import_invoice_lines
 from . import bank_statement

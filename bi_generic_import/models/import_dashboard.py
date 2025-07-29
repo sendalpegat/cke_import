@@ -17,7 +17,7 @@ class marketplace_inventory(models.Model):
             sorder_obj = self.env['sale.order']
             inventory_obj = self.env['stock.inventory']
             payment_obj = self.env['account.payment']
-            mrp_obj = self.env['mrp.bom']
+            # mrp_obj = self.env['mrp.bom']
             if count.state == 'sale.order':
                 import_count = sorder_obj.sudo().search_count([('is_import','=',True)])
                 count.import_data = import_count
@@ -30,9 +30,9 @@ class marketplace_inventory(models.Model):
             elif count.state == 'stock.picking':
                 import_count = picking_obj.sudo().search_count([('is_import','=',True)])
                 count.import_data = import_count  
-            elif count.state == 'mrp.bom':    
-                import_count = mrp_obj.sudo().search_count([('is_import','=',True)])
-                count.import_data = import_count                  
+            # elif count.state == 'mrp.bom':    
+            #     import_count = mrp_obj.sudo().search_count([('is_import','=',True)])
+            #     count.import_data = import_count                  
             elif count.state == 'res.partner':    
                 import_count = partner_obj.sudo().search_count([('is_import','=',True)])
                 count.import_data = import_count                  
@@ -61,7 +61,7 @@ class marketplace_inventory(models.Model):
         ('purchase.order', 'Purchase Orders'),
         ('account.move', 'Invoice/Bill'),
         ('stock.picking', 'Picking'),
-        ('mrp.bom', 'mrp'),
+        # ('mrp.bom', 'mrp'),
         ('res.partner', 'Partner'),
         ('product.pricelist', 'Pricelist'),
         ('product.template', 'Product Template'),

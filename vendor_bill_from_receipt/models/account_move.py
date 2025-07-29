@@ -58,3 +58,14 @@ class AccountMove(models.Model):
                 backorder_wizard.process()
 
         return res
+
+    @api.model
+    def create(self, vals):
+        # Auto cari dan set purchase_id jika invoice dibuat dari receipt
+        if not vals.get('purchase_id') and vals.get('invoice_origin'):
+            picking = self.env['stock.picking'].search([('name', '=', vals['invoice_origin'])], limit=1)
+            if picking and picking.origin:
+                purchase = self.env['purchase.order'].search([('name', '=', picking.origin)], limit=1)
+                if purchase:
+                    vals['purchase_id'] = purchase.id
+        return super(AccountMove, self).create(vals)
