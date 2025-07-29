@@ -168,6 +168,29 @@ class ProductTemplate(models.Model):
             variant_values_to_remove.unlink()
         to_remove.unlink()
 
+    def write(self, vals):
+        res = super(ProductTemplate, self).write(vals)
+        sync_fields = [
+            'motor_type', 'bearing_type', 'knob_switch_speed', 'cable_speed',
+            'remote_control', 'tou', 'led', 'manual_book'
+        ]
+        if any(f in vals for f in sync_fields):
+            self._sync_fields_to_variants(sync_fields)
+        return res
+
+    def _sync_fields_to_variants(self, fields_to_sync):
+        for template in self:
+            for variant in template.product_variant_ids:
+                update_vals = {f: getattr(template, f) for f in fields_to_sync}
+                variant.with_context(sync_from_template=True).write(update_vals)
+
+    def sync_fields_from_variant(self, variant):
+        sync_fields = [
+            'motor_type', 'bearing_type', 'knob_switch_speed', 'cable_speed',
+            'remote_control', 'tou', 'led', 'manual_book'
+        ]
+        update_vals = {f: getattr(variant, f) for f in sync_fields}
+        self.with_context(sync_from_variant=True).write(update_vals)
 
 # Field Summary untuk Semua Grup
     spec_field_summary = fields.Char(string="Specification Summary", compute="_compute_field_summaries", store=True)

@@ -14,6 +14,7 @@
         'views/product_template_views.xml',
         'views/product_category_views.xml',
         'views/product_product_views.xml',
+        # 'views/purchase_order_line_view.xml',
     ],
     'images': ['static/description/icon.png'],
     'installable': True,

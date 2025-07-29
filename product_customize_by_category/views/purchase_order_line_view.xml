@@ -1,0 +1,14 @@
+<odoo>
+  <record id="view_purchase_order_line_form_inherit_categories_template_summary" model="ir.ui.view">
+    <field name="name">purchase.order.line.form.inherit.categories.template.summary</field>
+    <field name="model">purchase.order.line</field>
+    <field name="inherit_id" ref="purchase.purchase_order_line_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='product_id']" position="after">
+        <group string="Categories Template">
+          <field name="categories_template_summary" readonly="1"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

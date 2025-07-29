@@ -183,6 +183,30 @@ class ProductProduct(models.Model):
         self._sync_from_template()
         return True
 
+    def write(self, vals):
+        sync_fields = [
+            'motor_type', 'bearing_type', 'knob_switch_speed', 'cable_speed',
+            'remote_control', 'tou', 'led', 'manual_book'
+        ]
+        # Deteksi perubahan field sync
+        is_sync = any(f in vals for f in sync_fields)
+        res = super(ProductProduct, self).write(vals)
+        # Jika tidak dari template, update template
+        if is_sync and not self.env.context.get('sync_from_template'):
+            for variant in self:
+                if variant.product_tmpl_id:
+                    variant.product_tmpl_id.sync_fields_from_variant(variant)
+        return res
+
+    # Jika update dari template, prevent looping
+    def sync_fields_from_template(self, template):
+        sync_fields = [
+            'motor_type', 'bearing_type', 'knob_switch_speed', 'cable_speed',
+            'remote_control', 'tou', 'led', 'manual_book'
+        ]
+        update_vals = {f: getattr(template, f) for f in sync_fields}
+        self.with_context(sync_from_template=True).write(update_vals)
+
     # spec_field_summary = fields.Char(string="Specification Summary", related='product_tmpl_id.spec_field_summary', store=True)
     # cable_field_summary = fields.Char(string="Cable", related='product_tmpl_id.cable_field_summary', store=True)
     # color_field_summary = fields.Char(string="Color", related='product_tmpl_id.color_field_summary', store=True)

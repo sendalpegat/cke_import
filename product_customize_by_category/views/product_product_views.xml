@@ -11,7 +11,7 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                                <field name="value"/>
                                 <field name="original_value" string="Original Value" readonly="1"/>
                                 <field name="is_locked" invisible="1"/>
                             </tree>
@@ -20,21 +20,21 @@
                         <!-- Field summary akan otomatis compute dari variant -->
                         <field name="spec_field_summary" readonly="1"/>
 
-                        <field name="motor_type" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="bearing_type" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="knob_switch_speed" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="cable_speed" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="remote_control" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="tou" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="led" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                        <field name="manual_book" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                        <field name="motor_type"/>
+                        <field name="bearing_type"/>
+                        <field name="knob_switch_speed"/>
+                        <field name="cable_speed"/>
+                        <field name="remote_control"/>
+                        <field name="tou"/>
+                        <field name="led"/>
+                        <field name="manual_book"/>
                         <field name="is_locked" invisible="1"/>
 
                         <field name="material_field_values">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                                <field name="value"/>
                                 <field name="original_value" string="Original Value" readonly="1"/>
                                 <field name="is_locked" invisible="1"/>
                             </tree>
@@ -46,7 +46,7 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                                <field name="value"/>
                                 <field name="original_value" string="Original Value" readonly="1"/>
                                 <field name="is_locked" invisible="1"/>
                             </tree>
@@ -58,7 +58,7 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="value" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                                <field name="value"/>
                                 <field name="original_value" string="Original Value" readonly="1"/>
                                 <field name="is_locked" invisible="1"/>
                             </tree>
