@@ -207,19 +207,6 @@ class ProductProduct(models.Model):
         update_vals = {f: getattr(template, f) for f in sync_fields}
         self.with_context(sync_from_template=True).write(update_vals)
 
-    @api.model
-    def batch_sync_variant_to_template(self):
-        variants = self.search([])
-        sync_fields = [
-            'motor_type', 'bearing_type', 'knob_switch_speed', 'cable_speed',
-            'remote_control', 'tou', 'led', 'manual_book'
-        ]
-        for variant in variants:
-            if variant.product_tmpl_id:
-                update_vals = {f: getattr(variant, f) for f in sync_fields}
-                variant.product_tmpl_id.with_context(sync_from_variant=True).write(update_vals)
-
-
     # spec_field_summary = fields.Char(string="Specification Summary", related='product_tmpl_id.spec_field_summary', store=True)
     # cable_field_summary = fields.Char(string="Cable", related='product_tmpl_id.cable_field_summary', store=True)
     # color_field_summary = fields.Char(string="Color", related='product_tmpl_id.color_field_summary', store=True)
