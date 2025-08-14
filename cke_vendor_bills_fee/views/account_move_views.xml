@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vendor Bills Form View -->
+        <record id="view_move_form_fee" model="ir.ui.view">
+            <field name="name">account.move.form.fee</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="priority">99</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_by_group']" position="after">
+                            <field name="fee_percentage" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <button name="action_refresh_fee" type="object" class="oe_link oe_edit_only fa fa-refresh" 
+                                    title="Refresh Fee Calculation" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            <field name="subtotal_before_fee" readonly="1"/>
+                            <field name="fee_amount" readonly="1"/>
+                            <field name="remaining_base" attrs="{'invisible': [('state', '!=', 'posted')]}"/>
+                            <field name="remaining_fee" attrs="{'invisible': [('state', '!=', 'posted')]}"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Vendor Bills Tree View -->
+<!--         <record id="view_move_tree_fee" model="ir.ui.view">
+            <field name="name">account.move.tree.fee</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total']" position="after">
+                    <field name="fee_percentage" optional="hide"/>
+                    <field name="fee_amount" optional="hide"/>
+                </xpath>
+            </field>
+        </record> -->
+    </data>
+</odoo>
