@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_receipt_info_form" model="ir.ui.view">
+        <field name="name">purchase.order.receipt.info.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_id" invisible="1"/>
+                <div class="alert alert-info" role="alert" 
+                     attrs="{'invisible': ['|', ('partner_id', '=', False), ('state', 'not in', ['draft', 'sent'])]}">
+                    <strong>Info:</strong> Receipt date akan otomatis diisi berdasarkan konfigurasi vendor.
+                    <span attrs="{'invisible': [('partner_id', '=', False)]}">
+                        Konfigurasi vendor saat ini: 
+                        <field name="partner_id" invisible="1"/>
+                    </span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Menambahkan informasi di tree view -->
+    <record id="view_purchase_order_tree_receipt_date" model="ir.ui.view">
+        <field name="name">purchase.order.tree.receipt.date</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="date_planned" string="Expected Receipt Date" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

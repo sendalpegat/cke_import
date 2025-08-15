@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit form view untuk menambahkan konfigurasi receipt date -->
+    <record id="view_partner_receipt_date_form" model="ir.ui.view">
+        <field name="name">res.partner.receipt.date.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Receipt Date Setting" attrs="{'invisible': [('is_company', '=', False), ('supplier_rank', '=', 0)]}">
+                    <!-- Tambahkan field yang diperlukan untuk attrs -->
+                    <field name="supplier_rank" invisible="1"/>
+                    <field name="is_company" invisible="1"/>
+                    
+                    <group string="Receipt Date Configuration">
+                        <group>
+                            <field name="receipt_date_type" widget="radio" string="Receipt Date Type"/>
+                        </group>
+                        <group>
+                            <field name="manual_receipt_date" 
+                                   attrs="{'invisible': [('receipt_date_type', '!=', 'manual')], 
+                                           'required': [('receipt_date_type', '=', 'manual')]}"
+                                   string="Manual Receipt Date"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>
