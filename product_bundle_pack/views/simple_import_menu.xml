@@ -2,9 +2,10 @@
 <odoo>
     <data>
         
-        <!-- Simple Menu Additions - No inheritance issues -->
+        <!-- REMOVED: All simple menu items -->
+        <!-- Import now only available through Dashboard and Product Pack menu -->
         
-        <!-- Action untuk quick access -->
+        <!-- Action kept for backward compatibility -->
         <record id="action_import_product_pack_quick" model="ir.actions.act_window">
             <field name="name">📥 Import Product Pack Components</field>
             <field name="res_model">import.product.pack.wizard</field>
@@ -12,30 +13,6 @@
             <field name="target">new</field>
             <field name="context">{}</field>
         </record>
-
-        <!-- Menu di Administration (Settings area) -->
-        <menuitem id="menu_import_admin"
-                  name="📥 Import Product Pack"
-                  parent="base.menu_administration"
-                  action="action_import_product_pack_quick"
-                  sequence="15"
-                  groups="base.group_system"/>
-
-        <!-- Menu di Sales area -->
-        <menuitem id="menu_import_sales"
-                  name="📥 Import Product Pack"
-                  parent="sale.product_menu_catalog"
-                  action="action_import_product_pack_quick"
-                  sequence="25"
-                  groups="sales_team.group_sale_manager"/>
-
-        <!-- Menu di Inventory area -->
-        <menuitem id="menu_import_inventory"
-                  name="📥 Import Product Pack"
-                  parent="stock.menu_stock_root"
-                  action="action_import_product_pack_quick"
-                  sequence="25"
-                  groups="stock.group_stock_manager"/>
 
     </data>
 </odoo>

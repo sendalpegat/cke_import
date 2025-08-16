@@ -2,6 +2,76 @@
 <odoo>
     <data>
         
+        <!-- Dashboard Kanban View untuk Quick Access -->
+        <record id="view_import_pack_dashboard_kanban" model="ir.ui.view">
+            <field name="name">import.pack.dashboard.kanban</field>
+            <field name="model">import.product.pack.wizard</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_dashboard" create="false" edit="false" delete="false">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                                <div class="o_kanban_image_fill_left d-none d-md-block" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <div class="o_kanban_image_inner_pic">
+                                        <i class="fa fa-upload fa-3x text-white"/>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <div class="o_kanban_record_top mb8">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">Import Product Pack</strong>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <div class="text-muted">Import product bundle components from Excel/CSV files</div>
+                                        <div class="mt8">
+                                            <span class="badge badge-pill badge-info">📊 Excel Support</span>
+                                            <span class="badge badge-pill badge-secondary">📄 CSV Support</span>
+                                            <span class="badge badge-pill badge-success">🔧 13 Fields</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Action untuk Dashboard Kanban -->
+        <record id="action_import_pack_dashboard" model="ir.actions.act_window">
+            <field name="name">Import Tools</field>
+            <field name="res_model">import.product.pack.wizard</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_import_pack_dashboard_kanban"/>
+            <field name="context">{'create': False}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Welcome to Import Tools!
+                </p>
+                <p>
+                    <a name="product_bundle_pack.action_import_product_pack_wizard" type="action" class="btn btn-primary">
+                        📥 Start Import Process
+                    </a>
+                </p>
+            </field>
+        </record>
+
+        <!-- Main Dashboard Menu -->
+        <menuitem id="menu_import_tools_main"
+                  name="🔧 Import Tools"
+                  web_icon="product_bundle_pack,static/description/import.jpg"
+                  action="action_import_pack_dashboard"
+                  sequence="25"
+                  groups="base.group_user"/>
+
+        <!-- Sub-menu untuk Import Product Pack -->
+        <menuitem id="menu_import_product_pack_main_dashboard"
+                  name="📥 Import Product Pack"
+                  parent="menu_import_tools_main"
+                  action="action_import_product_pack_wizard"
+                  sequence="10"/>
+
         <!-- Add Import Shortcut to Purchase Settings -->
         <record id="view_purchase_config_settings_inherit_import" model="ir.ui.view">
             <field name="name">res.config.settings.purchase.import.shortcut</field>
@@ -47,8 +117,8 @@
             </field>
         </record>
 
-        <!-- Separate view for adding control panel buttons -->
-        <record id="action_product_pack_list_with_import" model="ir.actions.act_window">
+        <!-- Enhanced help section for Product Pack list -->
+        <record id="action_product_pack_list_with_import_help" model="ir.actions.act_window">
             <field name="name">Product Components</field>
             <field name="res_model">product.pack</field>
             <field name="view_mode">tree,form</field>
@@ -58,11 +128,17 @@
                     Create components for product packs.
                 </p>
                 <p>
+                    You can add components manually or import from files:
+                </p>
+                <p>
                     <a name="product_bundle_pack.action_import_product_pack_wizard" 
                        type="action" 
                        class="btn btn-primary">
-                        📥 Import Components from File
+                        📥 Import Components from Excel/CSV
                     </a>
+                </p>
+                <p class="text-muted">
+                    Import supports 13 fields including product details, categories, brands, and automatic pack configuration.
                 </p>
             </field>
         </record>

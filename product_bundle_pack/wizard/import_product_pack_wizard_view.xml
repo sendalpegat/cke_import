@@ -114,24 +114,13 @@
                                         </div>
                                         <div class="card-body">
                                             <p>Download Excel template with sample data and proper formatting.</p>
-                                            <div class="mb8">
-                                                <button name="download_excel_template" 
-                                                        string="📥 Download Excel" 
-                                                        type="object" 
-                                                        class="btn btn-primary"/>
-                                            </div>
-                                            <div class="mb8">
-                                                <button name="action_download_excel_template" 
-                                                        string="📥 Excel (Method 2)" 
-                                                        type="object" 
-                                                        class="btn btn-outline-primary"/>
-                                            </div>
-                                            <div class="mb8">
-                                                <button name="action_generate_excel_manual" 
-                                                        string="📥 Excel (Method 3)" 
-                                                        type="object" 
-                                                        class="btn btn-outline-info"/>
-                                            </div>
+                                            <button name="download_excel_template" 
+                                                    string="📥 Download Excel Template" 
+                                                    type="object" 
+                                                    class="btn btn-primary"/>
+                                            <p class="text-muted mt8">
+                                                <small>If download doesn't work, try the manual template creation below.</small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -143,24 +132,13 @@
                                         </div>
                                         <div class="card-body">
                                             <p>Download CSV template for simple text-based import.</p>
-                                            <div class="mb8">
-                                                <button name="download_csv_template" 
-                                                        string="📥 Download CSV" 
-                                                        type="object" 
-                                                        class="btn btn-secondary"/>
-                                            </div>
-                                            <div class="mb8">
-                                                <button name="action_download_csv_template" 
-                                                        string="📥 CSV (Method 2)" 
-                                                        type="object" 
-                                                        class="btn btn-outline-secondary"/>
-                                            </div>
-                                            <div class="mb8">
-                                                <button name="action_generate_csv_manual" 
-                                                        string="📥 CSV (Method 3)" 
-                                                        type="object" 
-                                                        class="btn btn-outline-info"/>
-                                            </div>
+                                            <button name="download_csv_template" 
+                                                    string="📥 Download CSV Template" 
+                                                    type="object" 
+                                                    class="btn btn-secondary"/>
+                                            <p class="text-muted mt8">
+                                                <small>CSV format is more reliable and works on all systems.</small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -178,6 +156,10 @@
                                                     string="📋 Show Manual Instructions" 
                                                     type="object" 
                                                     class="btn btn-warning"/>
+                                            <button name="action_create_sample_file" 
+                                                    string="📄 Show Sample Content" 
+                                                    type="object" 
+                                                    class="btn btn-info ml8"/>
                                             
                                             <div class="mt16">
                                                 <h6>Column Headers (Copy exactly):</h6>
@@ -220,28 +202,12 @@
             <field name="context">{}</field>
         </record>
 
-        <!-- Menu Item di Product Pack (untuk backup akses) -->
+        <!-- ONLY Keep menu in Product Pack area -->
         <menuitem id="menu_import_product_pack_components"
                   name="📥 Import Components"
                   parent="product_bundle_pack.menu_product_pack_main"
                   action="action_import_product_pack_wizard"
                   sequence="30"/>
-
-        <!-- Menu Item di Dashboard Utama (Settings) -->
-        <menuitem id="menu_import_product_pack_dashboard"
-                  name="📥 Import Product Pack"
-                  parent="base.menu_administration"
-                  action="action_import_product_pack_wizard"
-                  sequence="15"
-                  groups="base.group_system,sales_team.group_sale_manager"/>
-
-        <!-- Menu Item di Inventory untuk mudah akses dari sana juga -->
-        <menuitem id="menu_import_product_pack_inventory"
-                  name="📥 Import Product Pack"
-                  parent="stock.menu_stock_config_settings"
-                  action="action_import_product_pack_wizard"
-                  sequence="10"
-                  groups="stock.group_stock_manager"/>
 
     </data>
 </odoo>

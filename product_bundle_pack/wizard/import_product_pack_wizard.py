@@ -31,18 +31,19 @@ class ImportProductPackWizard(models.TransientModel):
         help="If checked, all existing components will be removed and replaced with imported data."
     )
 
-    sample_file_excel = fields.Binary(
-        string='Excel Template',
-        readonly=True
-    )
+    # Remove problematic binary fields
+    # sample_file_excel = fields.Binary(
+    #     string='Excel Template',
+    #     readonly=True
+    # )
     
-    sample_file_csv = fields.Binary(
-        string='CSV Template', 
-        readonly=True
-    )
+    # sample_file_csv = fields.Binary(
+    #     string='CSV Template', 
+    #     readonly=True
+    # )
     
-    excel_filename = fields.Char(string='Excel Filename', default='product_pack_template.xlsx')
-    csv_filename = fields.Char(string='CSV Filename', default='product_pack_template.csv')
+    # excel_filename = fields.Char(string='Excel Filename', default='product_pack_template.xlsx')
+    # csv_filename = fields.Char(string='CSV Filename', default='product_pack_template.csv')
 
     def generate_excel_template(self):
         """Generate Excel template file"""
@@ -130,116 +131,91 @@ class ImportProductPackWizard(models.TransientModel):
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
-        res['excel_filename'] = 'product_pack_template.xlsx'
-        res['csv_filename'] = 'product_pack_template.csv'
+        # Remove binary field defaults that cause issues
         return res
 
     def download_excel_template(self):
-        """Download Excel template - Method 1"""
-        self.ensure_one()
-        
+        """Download Excel template - Direct to HTTP controller"""
         try:
-            template_data = self.generate_excel_template()
-            
-            # Method 1: Direct binary download
-            self.write({
-                'sample_file_excel': template_data,
-                'excel_filename': 'product_pack_template.xlsx'
-            })
-            
             return {
                 'type': 'ir.actions.act_url',
-                'url': f'/web/content/?model={self._name}&id={self.id}&field=sample_file_excel&filename={self.excel_filename}&download=true',
+                'url': '/import_pack/excel_template',
                 'target': 'new',
             }
         except Exception as e:
-            _logger.error(f"Excel download method 1 failed: {e}")
-            return self.action_download_excel_template()
+            _logger.error(f"Excel download failed: {e}")
+            return self.action_show_manual_template()
 
     def download_csv_template(self):
-        """Download CSV template - Method 1"""
-        self.ensure_one()
-        
+        """Download CSV template - Direct to HTTP controller"""
         try:
-            template_data = self.generate_csv_template()
-            
-            self.write({
-                'sample_file_csv': template_data,
-                'csv_filename': 'product_pack_template.csv'
-            })
-            
             return {
                 'type': 'ir.actions.act_url',
-                'url': f'/web/content/?model={self._name}&id={self.id}&field=sample_file_csv&filename={self.csv_filename}&download=true',
+                'url': '/import_pack/csv_template', 
                 'target': 'new',
             }
         except Exception as e:
-            _logger.error(f"CSV download method 1 failed: {e}")
-            return self.action_download_csv_template()
+            _logger.error(f"CSV download failed: {e}")
+            return self.action_show_manual_template()
 
     def action_download_excel_template(self):
         """Alternative method for downloading Excel template - Method 2"""
-        try:
-            template_data = self.generate_excel_template()
-            
-            # Create attachment for download
-            attachment = self.env['ir.attachment'].create({
-                'name': 'product_pack_template.xlsx',
-                'type': 'binary',
-                'datas': template_data,
-                'res_model': self._name,
-                'res_id': self.id,
-                'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'public': True,
-            })
-            
-            return {
-                'type': 'ir.actions.act_url',
-                'url': f'/web/content/{attachment.id}?download=true',
-                'target': 'new',
-            }
-        except Exception as e:
-            _logger.error(f"Excel download method 2 failed: {e}")
-            return self.action_generate_excel_manual()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/import_pack/excel_template',
+            'target': 'new',
+        }
 
     def action_download_csv_template(self):
         """Alternative method for downloading CSV template - Method 2"""
-        try:
-            template_data = self.generate_csv_template()
-            
-            # Create attachment for download
-            attachment = self.env['ir.attachment'].create({
-                'name': 'product_pack_template.csv',
-                'type': 'binary',
-                'datas': template_data,
-                'res_model': self._name,
-                'res_id': self.id,
-                'mimetype': 'text/csv',
-                'public': True,
-            })
-            
-            return {
-                'type': 'ir.actions.act_url',
-                'url': f'/web/content/{attachment.id}?download=true',
-                'target': 'new',
-            }
-        except Exception as e:
-            _logger.error(f"CSV download method 2 failed: {e}")
-            return self.action_generate_csv_manual()
-
-    def action_generate_excel_manual(self):
-        """Method 3: Generate Excel via HTTP controller"""
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/import_pack/excel_template?wizard_id={self.id}',
+            'url': '/import_pack/csv_template',
+            'target': 'new',
+        }
+
+    def action_create_sample_file(self):
+        """Create sample file content for manual creation"""
+        sample_content = """Parent Product Code,Parent Product Name,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Component Product Code,Component Product Name,Quantity,UOM,Component Cost
+BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,MOTOR001,Motor 1HP,1,Unit,1500000
+BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,CABLE001,Power Cable 5m,1,Unit,150000
+BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,SWITCH001,On/Off Switch,1,Unit,75000
+BUNDLE002,Fan Complete Set,TRUE,product,All / Saleable,FC-2024-002,Fan Pro,TRUE,FAN001,Industrial Fan 16",1,Unit,800000
+BUNDLE002,Fan Complete Set,TRUE,product,All / Saleable,FC-2024-002,Fan Pro,TRUE,STAND001,Fan Stand,1,Unit,200000"""
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'info',
+                'title': 'Sample File Content',
+                'message': f'''
+Copy this content to Excel/CSV file:
+
+{sample_content}
+
+Instructions:
+1. Create new Excel or CSV file
+2. Copy the content above
+3. Paste into first sheet starting from A1
+4. Save file
+5. Upload in import wizard
+                ''',
+                'sticky': True,
+            }
+        }
+        """Method 3: Same as HTTP controller"""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/import_pack/excel_template',
             'target': 'new',
         }
 
     def action_generate_csv_manual(self):
-        """Method 3: Generate CSV via HTTP controller"""
+        """Method 3: Same as HTTP controller"""
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/import_pack/csv_template?wizard_id={self.id}',
+            'url': '/import_pack/csv_template',
             'target': 'new',
         }
 
