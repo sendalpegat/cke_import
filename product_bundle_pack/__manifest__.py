@@ -25,6 +25,8 @@
         # 'views/stock_picking_view.xml',
         'wizard/product_bundle_wizard_view.xml',
         'wizard/explode_pack_wizard_view.xml',
+        'wizard/import_product_pack_wizard_view.xml',        # Import wizard view
+        'views/simple_import_menu.xml',                      # Simple menu without inheritance
         'security/ir.model.access.csv',
         'views/product_pack_view.xml',
     ],
