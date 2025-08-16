@@ -10,7 +10,7 @@ class ResPartner(models.Model):
         ('2_month', '2 Bulan'), 
         ('3_month', '3 Bulan'),
         ('manual', 'Manual')
-    ], string='Tipe Receipt Date', default='1_month',
+    ], string='Tipe Receipt Date', default='2_month',  # Changed from '1_month' to '2_month'
        help='Menentukan cara perhitungan receipt date untuk PO')
     
     manual_receipt_date = fields.Date(
@@ -40,5 +40,5 @@ class ResPartner(models.Model):
         elif self.receipt_date_type == 'manual' and self.manual_receipt_date:
             return self.manual_receipt_date
         else:
-            # Default ke 1 bulan jika tidak ada konfigurasi
-            return order_date + relativedelta(months=1)
+            # Default ke 2 bulan jika tidak ada konfigurasi (changed from 1 month to 2 months)
+            return order_date + relativedelta(months=2)

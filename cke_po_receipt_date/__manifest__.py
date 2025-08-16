@@ -9,15 +9,28 @@
         
         Features:
         - Vendor receipt date configuration (1 month, 2 months, 3 months, or manual date)
-        - Automatic receipt date calculation in Purchase Orders
+        - Automatic receipt date calculation in Purchase Orders (default 2 months)
         - Override option for manual adjustment
     """,
-    'author': 'Your Company',
+    'author': 'PT Industrial Multi Fan',
+    'maintainer': 'aRai',
+    'license': 'LGPL-3',
+    'website': "https://kipascke.co.id",
     'depends': ['purchase'],
     'data': [
         'views/res_partner_views.xml',
         'views/purchase_order_views.xml',
     ],
+    'qweb': [
+        'static/src/xml/purchase_order.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'static/src/js/purchase_order.js',
+        ],
+    },
+    'images': ['static/description/icon.png'],
     'installable': True,
+    'application': True,
     'auto_install': False,
 }
