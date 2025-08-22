@@ -1,0 +1,77 @@
+Product Bundle Pack
+===================
+
+Modul Odoo 14.0 untuk mendukung pengelolaan produk dalam bentuk *bundle* atau *pack* 
+yang terdiri dari beberapa komponen produk. Modul ini memperluas alur purchase, stock, 
+dan invoice dengan logika pembongkaran (*explode*) dan pelacakan relasi ke PO.
+
+-------------------------------------------------------
+Fitur Utama
+===========
+
+🧩 Product Pack / Bundle
+------------------------
+- Tambahkan produk baru, aktifkan `Is Product Pack` pada template.
+- Di tab *Pack Products*, isi komponen produk dan quantity-nya.
+- Jika `Calculate Pack Price` dicentang, maka harga jual atau beli otomatis berasal dari total harga komponen.
+
+📦 Integrasi dengan Purchase Order
+----------------------------------
+- Produk pack dapat dibeli dalam PO seperti produk biasa.
+- Saat PO dikonfirmasi dan dilakukan receipt, komponen pack akan di-*explode* otomatis ke `stock.move`.
+
+🧾 Vendor Bill & Explode Pack Wizard
+------------------------------------
+- Saat membuat vendor bill, jika ada produk pack, tombol **Explode Packs** akan tersedia.
+- Tombol ini akan:
+  * Menghapus invoice line yang berupa pack
+  * Menambahkan invoice line baru berdasarkan komponen pack
+  * Menampilkan `PO Reference` secara otomatis di sebelah nama produk (misal: `[PO04532] Motor Fan 1/2HP`)
+
+📄 PO Reference Otomatis di Invoice
+-----------------------------------
+- Field baru `purchase_order_ref` muncul di `account.move.line`
+- Diambil otomatis dari `move_id.purchase_id.name`
+- Kini tetap muncul meskipun invoice berstatus `commercial_invoice`
+
+📊 Statinfo Vendor Bills Tetap Muncul
+-------------------------------------
+- Field baru `purchase_id` ditambahkan ke `account.move`
+- Field `invoice_ids` ditambahkan ke `purchase.order` untuk melacak vendor bill secara langsung
+- Widget **statinfo "Vendor Bills"** di `purchase.order` akan selalu tampil (baik status `posted` maupun `commercial_invoice`)
+- Tombol "Vendor Bills" akan membuka daftar invoice yang terkait PO tersebut
+
+-------------------------------------------------------
+Integrasi
+=========
+
+✔ Kompatibel dengan modul `purchase_advance_payment`:
+- Mendukung status invoice `commercial_invoice`
+- Tidak membutuhkan dependensi langsung (decoupled)
+- PO Reference tetap terhubung
+
+-------------------------------------------------------
+Instalasi
+=========
+
+1. Salin modul ke folder addons Anda.
+2. Pastikan dependensi `purchase`, `product`, `account`, dan `stock` sudah tersedia.
+3. Jalankan upgrade:
+
+::
+
+    odoo-bin -u product_bundle_pack -d nama_database
+
+4. Uji alur:
+   - Buat PO → pilih produk pack
+   - Terima produk (receipt) → create bill
+   - Gunakan tombol "Explode Packs" → cek invoice lines & PO
+
+-------------------------------------------------------
+Informasi Tambahan
+==================
+
+- Author: PT Industrial Multi Fan
+- Maintainer: aRai
+- Website: https://kipascke.co.id
+- License: LGPL-3

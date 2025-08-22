@@ -1,0 +1,15 @@
+<odoo>
+  <data>
+    <record id="view_move_form_inherit_add_po_ref" model="ir.ui.view">
+      <field name="name">account.move.form.inherit.po.ref</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="before">
+          <field name="purchase_order_ref"/>
+          <field name="is_exploded_component" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

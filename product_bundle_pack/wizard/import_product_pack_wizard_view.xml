@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Import Product Pack Wizard Form View -->
+        <record id="view_import_product_pack_wizard_form" model="ir.ui.view">
+            <field name="name">import.product.pack.wizard.form</field>
+            <field name="model">import.product.pack.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Import Product Pack Components">
+                    <group>
+                        <group>
+                            <field name="import_type" widget="radio"/>
+                            <field name="file_data" filename="file_name"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="update_existing"/>
+                            <field name="replace_all" 
+                                   attrs="{'invisible': [('update_existing', '=', False)]}"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Import Instructions" name="instructions">
+                            <div class="alert alert-info" role="alert">
+                                <h4>📋 Import Instructions</h4>
+                                <p><strong>File Format Requirements:</strong></p>
+                                <ul>
+                                    <li><strong>Parent Product Code:</strong> Code of the bundle/pack product (Required)</li>
+                                    <li><strong>Parent Product Name:</strong> Name of bundle product (Optional - used if product doesn't exist)</li>
+                                    <li><strong>Is Pack:</strong> Mark parent as bundle (TRUE/FALSE, YES/NO, 1/0, Y/N) (Optional - defaults to TRUE)</li>
+                                    <li><strong>Type:</strong> Product type (product/consu/service) (Optional - defaults to 'product')</li>
+                                    <li><strong>Category:</strong> Product category name (Optional)</li>
+                                    <li><strong>Factory Model No:</strong> Factory model number (Optional)</li>
+                                    <li><strong>Product Brand:</strong> Brand name (Optional)</li>
+                                    <li><strong>Cal Pack Price:</strong> Calculate pack price (TRUE/FALSE) (Optional - defaults to FALSE)</li>
+                                    <li><strong>Component Product Code:</strong> Code of component product (Required)</li>
+                                    <li><strong>Component Product Name:</strong> Name of component (Optional - used if product doesn't exist)</li>
+                                    <li><strong>Quantity:</strong> Quantity of component in the pack (Required, must be > 0)</li>
+                                    <li><strong>UOM:</strong> Unit of Measure (Optional, defaults to 'Unit')</li>
+                                    <li><strong>Component Cost:</strong> Cost price of component (Optional)</li>
+                                </ul>
+                                
+                                <p><strong>Import Options:</strong></p>
+                                <ul>
+                                    <li><strong>Update Existing Components:</strong> If checked, existing pack components will be updated with new quantities</li>
+                                    <li><strong>Replace All Components:</strong> If checked, all existing components will be removed and replaced with imported data</li>
+                                </ul>
+                                
+                                <p><strong>Notes:</strong></p>
+                                <ul>
+                                    <li>If products don't exist, they will be created automatically</li>
+                                    <li>Parent products will be marked as "Is Product Pack" based on the "Is Pack" field</li>
+                                    <li>If "Is Pack" is TRUE, parent will be set as bundle product</li>
+                                    <li>If "Is Pack" is FALSE, parent will be unset as bundle (normal product)</li>
+                                    <li>Product type can be: 'product' (stockable), 'consu' (consumable), or 'service'</li>
+                                    <li>Category will be matched by name or complete name</li>
+                                    <li>Brand field requires 'product.brand' model (may be custom)</li>
+                                    <li>Cal Pack Price automatically calculates bundle price from components</li>
+                                    <li>Component costs will be updated if provided</li>
+                                    <li>If Excel download doesn't work, use the CSV template or create manually with the format above</li>
+                                </ul>
+                                
+                                <div class="alert alert-warning mt16" role="alert">
+                                    <h6>📝 Manual Template Creation</h6>
+                                    <p>If download doesn't work, create Excel/CSV with these columns:</p>
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Parent Product Code</th>
+                                                <th>Parent Product Name</th>
+                                                <th>Is Pack</th>
+                                                <th>Type</th>
+                                                <th>Category</th>
+                                                <th>Factory Model No</th>
+                                                <th>Product Brand</th>
+                                                <th>Cal Pack Price</th>
+                                                <th>Component Product Code</th>
+                                                <th>Component Product Name</th>
+                                                <th>Quantity</th>
+                                                <th>UOM</th>
+                                                <th>Component Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>BUNDLE001</td>
+                                                <td>Motor Package Set</td>
+                                                <td>TRUE</td>
+                                                <td>product</td>
+                                                <td>All / Saleable</td>
+                                                <td>MP-2024-001</td>
+                                                <td>Industrial Brand</td>
+                                                <td>TRUE</td>
+                                                <td>MOTOR001</td>
+                                                <td>Motor 1HP</td>
+                                                <td>1</td>
+                                                <td>Unit</td>
+                                                <td>1500000</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </page>
+                        
+                        <page string="Download Templates" name="templates">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>📊 Excel Template</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Download Excel template with sample data and proper formatting.</p>
+                                            <button name="download_excel_template" 
+                                                    string="📥 Download Excel Template" 
+                                                    type="object" 
+                                                    class="btn btn-primary"/>
+                                            <p class="text-muted mt8">
+                                                <small>If download doesn't work, try the manual template creation below.</small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>📄 CSV Template</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Download CSV template for simple text-based import.</p>
+                                            <button name="download_csv_template" 
+                                                    string="📥 Download CSV Template" 
+                                                    type="object" 
+                                                    class="btn btn-secondary"/>
+                                            <p class="text-muted mt8">
+                                                <small>CSV format is more reliable and works on all systems.</small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt16">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>📝 Manual Template Creation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>If download methods don't work, create file manually:</p>
+                                            <button name="action_show_manual_template" 
+                                                    string="📋 Show Manual Instructions" 
+                                                    type="object" 
+                                                    class="btn btn-warning"/>
+                                            <button name="action_create_sample_file" 
+                                                    string="📄 Show Sample Content" 
+                                                    type="object" 
+                                                    class="btn btn-info ml8"/>
+                                            
+                                            <div class="mt16">
+                                                <h6>Column Headers (Copy exactly):</h6>
+                                                <div class="alert alert-light">
+                                                    <code>Parent Product Code,Parent Product Name,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Component Product Code,Component Product Name,Quantity,UOM,Component Cost</code>
+                                                </div>
+                                                
+                                                <h6>Sample Data Row:</h6>
+                                                <div class="alert alert-light">
+                                                    <code>BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,MOTOR001,Motor 1HP,1,Unit,1500000</code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                    
+                    <footer>
+                        <button name="button_import" 
+                                string="🚀 Import Components" 
+                                type="object" 
+                                class="btn btn-primary"
+                                attrs="{'invisible': [('file_data', '=', False)]}"/>
+                        <button string="Cancel" 
+                                special="cancel" 
+                                class="btn btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Import Product Pack Wizard Action -->
+        <record id="action_import_product_pack_wizard" model="ir.actions.act_window">
+            <field name="name">Import Product Pack Components</field>
+            <field name="res_model">import.product.pack.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- ONLY Keep menu in Product Pack area -->
+        <menuitem id="menu_import_product_pack_components"
+                  name="📥 Import Components"
+                  parent="product_bundle_pack.menu_product_pack_main"
+                  action="action_import_product_pack_wizard"
+                  sequence="30"/>
+
+    </data>
+</odoo>
