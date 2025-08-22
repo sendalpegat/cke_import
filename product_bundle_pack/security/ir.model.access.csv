@@ -4,4 +4,3 @@ access_product_pack_manager,product.bundle.manager,model_product_pack,sales_team
 access_wizard_product_bundle_bi,wizard.product.bundle.bi,model_wizard_product_bundle_bi,,1,1,1,1
 access_explode_pack_wizard_user,explode.pack.wizard,model_explode_pack_wizard,,1,1,1,0
 access_explode_pack_line_user,explode.pack.line,model_explode_pack_line,,1,1,1,0
-access_import_product_pack_wizard_user,import.product.pack.wizard,model_import_product_pack_wizard,,1,1,1,1

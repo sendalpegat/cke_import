@@ -9,8 +9,10 @@
         Fee works like discount but as addition instead of reduction.
         When payment is made with different amount, fee is calculated proportionally.
     """,
-    'author': 'Your Company',
-    'website': 'https://www.yourcompany.com',
+    'author': 'PT Industrial Multi Fan',
+    'maintainer': 'aRai',
+    'license': 'LGPL-3',
+    'website': "https://kipascke.co.id",
     'depends': ['account'],
     'data': [
         'views/account_move_views.xml',

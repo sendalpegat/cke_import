@@ -1,0 +1,31 @@
+# views/monitoring_views.xml - Add to views
+class ReportExcelMonitoringViews:
+    monitoring_view = """
+    <record id="view_report_excel_monitoring_tree" model="ir.ui.view">
+        <field name="name">report.excel.monitoring.tree</field>
+        <field name="model">report.excel.monitoring</field>
+        <field name="arch" type="xml">
+            <tree string="Report Monitoring">
+                <field name="generation_date"/>
+                <field name="report_id"/>
+                <field name="user_id"/>
+                <field name="execution_time"/>
+                <field name="record_count"/>
+                <field name="file_size"/>
+                <field name="success"/>
+                <field name="error_message"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_report_excel_monitoring_graph" model="ir.ui.view">
+        <field name="name">report.excel.monitoring.graph</field>
+        <field name="model">report.excel.monitoring</field>
+        <field name="arch" type="xml">
+            <graph string="Report Performance">
+                <field name="generation_date" type="row"/>
+                <field name="execution_time" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    """
