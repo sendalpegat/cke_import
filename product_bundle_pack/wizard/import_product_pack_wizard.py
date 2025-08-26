@@ -62,9 +62,9 @@ class ImportProductPackWizard(models.TransientModel):
             
             # Headers
             headers = [
-                'Parent Product Code', 'Parent Product Name', 'Is Pack', 'Type', 'Category', 
-                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Component Product Code', 
-                'Component Product Name', 'Quantity', 'UOM', 'Component Cost'
+                'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category', 
+                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part', 
+                'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
             ]
             
             for col, header in enumerate(headers):
@@ -108,9 +108,9 @@ class ImportProductPackWizard(models.TransientModel):
         
         # Headers
         headers = [
-            'Parent Product Code', 'Parent Product Name', 'Is Pack', 'Type', 'Category',
-            'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Component Product Code',
-            'Component Product Name', 'Quantity', 'UOM', 'Component Cost'
+            'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category',
+            'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part',
+            'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
         ]
         writer.writerow(headers)
         
@@ -176,7 +176,7 @@ class ImportProductPackWizard(models.TransientModel):
 
     def action_create_sample_file(self):
         """Create sample file content for manual creation"""
-        sample_content = """Parent Product Code,Parent Product Name,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Component Product Code,Component Product Name,Quantity,UOM,Component Cost
+        sample_content = """Kode Unit,Deskripsi,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Kode Part,Deskripsi Part,Quantity,UOM,Part Cost
 BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,MOTOR001,Motor 1HP,1,Unit,1500000
 BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,CABLE001,Power Cable 5m,1,Unit,150000
 BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,SWITCH001,On/Off Switch,1,Unit,75000
@@ -229,19 +229,19 @@ Instructions:
                 'title': 'Manual Template Creation',
                 'message': '''
 Create Excel/CSV file with these exact column headers:
-1. Parent Product Code (Required)
-2. Parent Product Name (Optional)
+1. Kode Unit (Required)
+2. Deskripsi (Optional)
 3. Is Pack (TRUE/FALSE, YES/NO, 1/0, Y/N - defaults to TRUE)
 4. Type (product/consu/service - defaults to product)
 5. Category (Optional - category name)
 6. Factory Model No (Optional)
 7. Product Brand (Optional - brand name)
 8. Cal Pack Price (TRUE/FALSE - defaults to FALSE)
-9. Component Product Code (Required)
-10. Component Product Name (Optional)
+9. Kode Part (Required)
+10. Deskripsi Part (Optional)
 11. Quantity (Required, must be > 0)
 12. UOM (Optional, defaults to Unit)
-13. Component Cost (Optional)
+13. Part Cost (Optional)
 
 Sample rows:
 BUNDLE001,Motor Package Set,TRUE,product,All / Saleable,MP-2024-001,Industrial Brand,TRUE,MOTOR001,Motor 1HP,1,Unit,1500000
@@ -322,7 +322,7 @@ Field Details:
         errors = []
         
         # Required fields
-        required_fields = ['Parent Product Code', 'Component Product Code', 'Quantity']
+        required_fields = ['Kode Unit', 'Kode Part', 'Quantity']
         for field in required_fields:
             if not row.get(field):
                 errors.append(_("Missing required field: %s") % field)
@@ -556,19 +556,19 @@ Field Details:
         updated_count = 0
         
         for row in data:
-            parent_code = row.get('Parent Product Code', '').strip()
-            parent_name = row.get('Parent Product Name', '').strip()
+            parent_code = row.get('Kode Unit', '').strip()
+            parent_name = row.get('Deskripsi', '').strip()
             is_pack_value = self._parse_is_pack_value(row.get('Is Pack', ''))
             product_type = self._parse_product_type(row.get('Type', ''))
             category_name = row.get('Category', '').strip()
             factory_model_no = row.get('Factory Model No', '').strip()
             brand_name = row.get('Product Brand', '').strip()
             cal_pack_price = self._parse_cal_pack_price(row.get('Cal Pack Price', ''))
-            component_code = row.get('Component Product Code', '').strip()
-            component_name = row.get('Component Product Name', '').strip()
+            component_code = row.get('Kode Part', '').strip()
+            component_name = row.get('Deskripsi Part', '').strip()
             quantity = float(row.get('Quantity', 1))
             uom_name = row.get('UOM', 'Unit').strip()
-            component_cost = float(row.get('Component Cost', 0)) if row.get('Component Cost') else 0
+            component_cost = float(row.get('Part Cost', 0)) if row.get('Part Cost') else 0
             
             # Find related records
             category_id = None
@@ -616,7 +616,7 @@ Field Details:
                 _logger.warning(f"Component product not found: {component_code}")
                 continue
             
-            # Update component cost if provided
+            # Update Part Cost if provided
             if component_cost > 0 and component_product.standard_price != component_cost:
                 component_product.write({'standard_price': component_cost})
             

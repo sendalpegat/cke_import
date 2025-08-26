@@ -27,19 +27,19 @@
                                 <h4>📋 Import Instructions</h4>
                                 <p><strong>File Format Requirements:</strong></p>
                                 <ul>
-                                    <li><strong>Parent Product Code:</strong> Code of the bundle/pack product (Required)</li>
-                                    <li><strong>Parent Product Name:</strong> Name of bundle product (Optional - used if product doesn't exist)</li>
+                                    <li><strong>Kode Unit:</strong> Code of the bundle/pack product (Required)</li>
+                                    <li><strong>Deskripsi:</strong> Name of bundle product (Optional - used if product doesn't exist)</li>
                                     <li><strong>Is Pack:</strong> Mark parent as bundle (TRUE/FALSE, YES/NO, 1/0, Y/N) (Optional - defaults to TRUE)</li>
                                     <li><strong>Type:</strong> Product type (product/consu/service) (Optional - defaults to 'product')</li>
                                     <li><strong>Category:</strong> Product category name (Optional)</li>
                                     <li><strong>Factory Model No:</strong> Factory model number (Optional)</li>
                                     <li><strong>Product Brand:</strong> Brand name (Optional)</li>
                                     <li><strong>Cal Pack Price:</strong> Calculate pack price (TRUE/FALSE) (Optional - defaults to FALSE)</li>
-                                    <li><strong>Component Product Code:</strong> Code of component product (Required)</li>
-                                    <li><strong>Component Product Name:</strong> Name of component (Optional - used if product doesn't exist)</li>
+                                    <li><strong>Kode Part:</strong> Code of component product (Required)</li>
+                                    <li><strong>Deskripsi Part:</strong> Name of component (Optional - used if product doesn't exist)</li>
                                     <li><strong>Quantity:</strong> Quantity of component in the pack (Required, must be > 0)</li>
                                     <li><strong>UOM:</strong> Unit of Measure (Optional, defaults to 'Unit')</li>
-                                    <li><strong>Component Cost:</strong> Cost price of component (Optional)</li>
+                                    <li><strong>Part Cost:</strong> Cost price of component (Optional)</li>
                                 </ul>
                                 
                                 <p><strong>Import Options:</strong></p>
@@ -58,7 +58,7 @@
                                     <li>Category will be matched by name or complete name</li>
                                     <li>Brand field requires 'product.brand' model (may be custom)</li>
                                     <li>Cal Pack Price automatically calculates bundle price from components</li>
-                                    <li>Component costs will be updated if provided</li>
+                                    <li>Part Costs will be updated if provided</li>
                                     <li>If Excel download doesn't work, use the CSV template or create manually with the format above</li>
                                 </ul>
                                 
@@ -68,19 +68,19 @@
                                     <table class="table table-sm table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Parent Product Code</th>
-                                                <th>Parent Product Name</th>
+                                                <th>Kode Unit</th>
+                                                <th>Deskripsi</th>
                                                 <th>Is Pack</th>
                                                 <th>Type</th>
                                                 <th>Category</th>
                                                 <th>Factory Model No</th>
                                                 <th>Product Brand</th>
                                                 <th>Cal Pack Price</th>
-                                                <th>Component Product Code</th>
-                                                <th>Component Product Name</th>
+                                                <th>Kode Part</th>
+                                                <th>Deskripsi Part</th>
                                                 <th>Quantity</th>
                                                 <th>UOM</th>
-                                                <th>Component Cost</th>
+                                                <th>Part Cost</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -164,7 +164,7 @@
                                             <div class="mt16">
                                                 <h6>Column Headers (Copy exactly):</h6>
                                                 <div class="alert alert-light">
-                                                    <code>Parent Product Code,Parent Product Name,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Component Product Code,Component Product Name,Quantity,UOM,Component Cost</code>
+                                                    <code>Kode Unit,Deskripsi,Is Pack,Type,Category,Factory Model No,Product Brand,Cal Pack Price,Kode Part,Deskripsi Part,Quantity,UOM,Part Cost</code>
                                                 </div>
                                                 
                                                 <h6>Sample Data Row:</h6>

@@ -29,9 +29,9 @@ class TemplateDownloadController(http.Controller):
             
             # Headers
             headers = [
-                'Parent Product Code', 'Parent Product Name', 'Is Pack', 'Type', 'Category',
-                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Component Product Code', 
-                'Component Product Name', 'Quantity', 'UOM', 'Component Cost'
+                'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category',
+                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part', 
+                'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
             ]
             
             for col, header in enumerate(headers):
@@ -85,9 +85,9 @@ class TemplateDownloadController(http.Controller):
             
             # Headers
             headers = [
-                'Parent Product Code', 'Parent Product Name', 'Is Pack', 'Type', 'Category',
-                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Component Product Code',
-                'Component Product Name', 'Quantity', 'UOM', 'Component Cost'
+                'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category',
+                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part',
+                'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
             ]
             writer.writerow(headers)
             
