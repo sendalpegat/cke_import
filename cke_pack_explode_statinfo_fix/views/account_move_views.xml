@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Tambahkan kolom bantu PO Ref dan indikator komponen explode pada Bill Lines -->
+  <record id="view_move_form_inherit_explode_statinfo_fix" model="ir.ui.view">
+    <field name="name">account.move.form.explode.statinfo.fix</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+      <!-- Cari tree invoice_line_ids pada form Vendor Bill -->
+      <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+        <attribute name="create">1</attribute>
+        <attribute name="edit">1</attribute>
+      </xpath>
+
+      <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="after">
+        <!-- Opsional: tampilkan PO Ref -->
+        <field name="purchase_order_ref" optional="show"/>
+        <!-- Opsional: indikator komponen explode -->
+        <field name="is_exploded_component" widget="boolean_toggle" optional="hide"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
