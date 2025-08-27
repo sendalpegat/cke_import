@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Tidak ada perubahan UI PO; file ini hanya untuk memastikan dependensi view tersusun -->
+  <!-- Semua logika warning di-trigger dari override action_view_invoice() -->
+</odoo>

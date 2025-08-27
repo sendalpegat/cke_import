@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_bill_pack_warning_wizard_form" model="ir.ui.view">
+    <field name="name">bill.pack.warning.wizard.form</field>
+    <field name="model">bill.pack.warning.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Pack Warning" create="false" edit="false">
+        <group>
+          <field name="move_id" invisible="1"/>
+          <field name="message" nolabel="1" readonly="1"/>
+        </group>
+        <footer>
+          <button name="action_try_open_explode" type="object" class="btn-primary"
+                  string="Run Wizard Explode"/>
+          <button name="action_open_bill" type="object" string="Create Bill Only" class="btn-secondary"/>
+          <button string="Cancel" special="cancel" class="btn-link"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bill_pack_warning_wizard" model="ir.actions.act_window">
+    <field name="name">Pack Warning</field>
+    <field name="res_model">bill.pack.warning.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="view_id" ref="view_bill_pack_warning_wizard_form"/>
+  </record>
+</odoo>
