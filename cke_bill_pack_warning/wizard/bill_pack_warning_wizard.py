@@ -12,7 +12,7 @@ class BillPackWarningWizard(models.TransientModel):
     def _default_message(self):
         return _(
             "<p><b>Bill ini berisi produk PACK (memiliki part).</b></p>"
-            # "<p>Untuk menjaga keterkaitan ke Purchase Order (statinfo Vendor Bills) dan akurasi analitik, sebaiknya jalankan <i>Explode Packs</i> sehingga komponen ditambahkan sebagai baris invoice dengan tautan ke PO line.</p>"
+            "<p>Jalankan <i>Explode Packs</i> sehingga part ditambahkan sebagai baris invoice dengan link ke PO line.</p>"
         )
 
     @api.model

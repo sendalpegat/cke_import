@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="view_move_form_receipts_after_post" model="ir.ui.view">
+      <field name="name">account.move.form.pickinglist.after.post</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <!-- HANYA Picking List -->
+          <button name="action_view_receipt_products"
+                  type="object"
+                  string="Picking List"
+                  class="btn-secondary"
+                  attrs="{'invisible': ['|', ('state','!=','posted'), ('receipt_move_ids','=',[])]}"/>
+          <button name="action_view_receipt_products"
+                  type="object"
+                  class="oe_stat_button"
+                  attrs="{'invisible': ['|', ('state','!=','posted'), ('receipt_move_ids','=',[])]}"
+                  icon="fa-list">
+            <field name="receipt_product_count" widget="statinfo" string="Picking List"/>
+          </button>
+        </xpath>
+
+        <!-- Tab inline: Picking List -->
+        <xpath expr="//sheet/notebook" position="inside">
+          <page string="Picking List"
+                attrs="{'invisible': ['|', ('state','!=','posted'), ('receipt_move_ids','=',[])]}">
+            <field name="receipt_move_ids" nolabel="1"
+                   context="{'tree_view_ref': 'cke_vendor_bill_receipts.view_receipt_move_tree'}">
+              <tree string="Picking List" create="false" delete="false" edit="false">
+                <field name="picking_id"/>
+                <field name="date"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty" string="Demand"/>
+                <field name="quantity_done" string="Done"/>
+                <field name="product_uom"/>
+                <field name="state"/>
+                <field name="location_id" string="From"/>
+                <field name="location_dest_id" string="To"/>
+                <field name="reference"/>
+              </tree>
+            </field>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>

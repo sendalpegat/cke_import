@@ -6,8 +6,8 @@ class PurchaseOrder(models.Model):
 
     def action_view_invoice(self, invoices=False):
         """
-        memanggil method ini kadang dengan argumen 'invoices' (recordset account.move).
-        Pertahankan signature aslinya, lalu intercept hasil action untuk
+        Odoo 14 memanggil method ini kadang dengan argumen 'invoices' (recordset account.move).
+        Kita pertahankan signature aslinya, lalu intercept hasil action untuk
         menampilkan warning jika bill berisi produk PACK.
         """
         # Panggil bawaan dengan argumen asli

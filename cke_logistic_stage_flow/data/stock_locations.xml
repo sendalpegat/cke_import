@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+
+    <!-- Parent generik untuk transit logistik -->
+    <record id="loc_logistics_transit_root" model="stock.location">
+      <field name="name">Logistics Transit</field>
+      <field name="usage">internal</field>
+      <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="loc_boarded" model="stock.location">
+      <field name="name">Boarded</field>
+      <field name="usage">internal</field>
+      <field name="location_id" ref="cke_logistic_stage_flow.loc_logistics_transit_root"/>
+      <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="loc_customs" model="stock.location">
+      <field name="name">Customs</field>
+      <field name="usage">internal</field>
+      <field name="location_id" ref="cke_logistic_stage_flow.loc_logistics_transit_root"/>
+      <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="loc_arrived" model="stock.location">
+      <field name="name">Arrived</field>
+      <field name="usage">internal</field>
+      <field name="location_id" ref="cke_logistic_stage_flow.loc_logistics_transit_root"/>
+      <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="loc_gudang_vsj" model="stock.location">
+      <field name="name">Gudang VSJ</field>
+      <field name="usage">internal</field>
+      <field name="location_id" ref="cke_logistic_stage_flow.loc_logistics_transit_root"/>
+      <field name="company_id" eval="False"/>
+    </record>
+
+  </data>
+</odoo>

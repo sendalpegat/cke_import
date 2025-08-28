@@ -11,6 +11,6 @@
         "views/bill_pack_warning_wizard_views.xml",
         "views/purchase_views.xml",
     ],
-    "application": False,
+    "application": True,
     "installable": True,
 }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="view_receipt_move_tree" model="ir.ui.view">
+      <field name="name">stock.move.tree.picking.list</field>
+      <field name="model">stock.move</field>
+      <field name="arch" type="xml">
+        <tree string="Picking List" create="false" delete="false" edit="false">
+          <!-- PO -->
+          <field name="po_reference" string="PO"/>
+          <field name="picking_id"/>
+          <field name="date"/>
+          <field name="product_id"/>
+          <field name="product_uom_qty" string="Demand"/>
+          <field name="quantity_done" string="Done"/>
+          <field name="product_uom"/>
+          <field name="state"/>
+
+          <!-- Lokasi fisik -->
+          <field name="location_id" string="From Location"/>
+          <field name="location_dest_id" string="To Location"/>
+
+          <!-- Stage tracking -->
+          <field name="stage_current" string="Stage"/>
+          <field name="stage_from" string="From Stage"/>
+          <field name="stage_to" string="To Stage"/>
+          <field name="stage_move_date" string="Stage Date"/>
+        </tree>
+      </field>
+    </record>
+
+  </data>
+</odoo>

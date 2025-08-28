@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Action (muncul di menu Action) pada list stock.move -->
+    <record id="action_open_logistic_stage_wizard" model="ir.actions.act_window">
+      <field name="name">Change Logistic Stage</field>
+      <field name="res_model">logistic.stage.move.wizard</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+      <!-- binding agar muncul di Actions list view stock.move -->
+      <field name="binding_model_id" ref="stock.model_stock_move"/>
+      <field name="binding_view_types">list</field>
+      <field name="context">{'default_move_ids': active_ids}</field>
+    </record>
+
+  </data>
+</odoo>

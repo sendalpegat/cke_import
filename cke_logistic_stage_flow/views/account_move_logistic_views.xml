@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="view_move_form_logistic_stage" model="ir.ui.view">
+      <field name="name">account.move.form.logistic.stage</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <!-- Statusbar Logistic Stage -->
+          <field name="logistic_state" widget="statusbar"
+                 statusbar_visible="loaded,boarded,customs,arrived,gudang_vsj"
+                 attrs="{'invisible': [('state','!=','posted')]}"/>
+
+          <!-- Tombol untuk pindah tahap (bikin internal transfer) -->
+          <button name="action_open_logistic_stage_wizard"
+                  type="object"
+                  string="Change Stage"
+                  class="btn-secondary"
+                  attrs="{'invisible': [('state','!=','posted')]}"/>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>

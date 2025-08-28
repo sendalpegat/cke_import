@@ -37,6 +37,19 @@ class AccountMoveLine(models.Model):
 
     is_exploded_component = fields.Boolean(string='Exploded Component', default=False)
 
+    # Tambahkan field untuk mempertahankan relasi PO
+    purchase_order_ref = fields.Char(
+        string='PO Reference',
+        compute='_compute_purchase_order_ref',
+        store=True
+    )
+
+    @api.depends('move_id.purchase_id', 'purchase_line_id')
+    def _compute_purchase_order_ref(self):
+        for line in self:
+            po = line.move_id.purchase_id or (line.purchase_line_id and line.purchase_line_id.order_id)
+            line.purchase_order_ref = po.name if po else False
+
     @api.model
     def unlink(self):
         for line in self:
