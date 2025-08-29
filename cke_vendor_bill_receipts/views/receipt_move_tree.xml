@@ -9,23 +9,37 @@
         <tree string="Picking List" create="false" delete="false" edit="false">
           <!-- PO -->
           <field name="po_reference" string="PO"/>
+          
+          <!-- Transfer -->
           <field name="picking_id"/>
-          <field name="date"/>
+
+          <!-- Container # (setelah Transfer) -->
+          <field name="container_number" string="Container #"/>
+
+          <!-- Tanggal tanpa jam -->
+          <field name="date" string="Date Scheduled" widget="date"/>
+
           <field name="product_id"/>
-          <field name="product_uom_qty" string="Demand"/>
+          <field name="product_uom_qty" string="PO Qty"/>
           <field name="quantity_done" string="Done"/>
-          <field name="product_uom"/>
-          <field name="state"/>
+          <field name="product_uom" string="UoM"/>
 
-          <!-- Lokasi fisik -->
-          <field name="location_id" string="From Location"/>
-          <field name="location_dest_id" string="To Location"/>
+          <!-- Status -->
+          <field name="state" string="CI Status"/>
 
-          <!-- Stage tracking -->
-          <field name="stage_current" string="Stage"/>
-          <field name="stage_from" string="From Stage"/>
-          <field name="stage_to" string="To Stage"/>
-          <field name="stage_move_date" string="Stage Date"/>
+          <!-- Sembunyikan lokasi fisik -->
+          <field name="location_id" string="From Location" invisible="1"/>
+          <field name="location_dest_id" string="To Location" invisible="1"/>
+
+          <!-- Stage: pakai badge HTML -->
+          <field name="stage_badge_html" string="Stage" widget="html"/>
+
+          <!-- Sembunyikan From/To Stage -->
+          <field name="stage_from" string="From Stage" invisible="1"/>
+          <field name="stage_to" string="To Stage" invisible="1"/>
+
+          <!-- Stage Date tanpa jam -->
+          <field name="stage_move_date" string="Stage Date" widget="date"/>
         </tree>
       </field>
     </record>

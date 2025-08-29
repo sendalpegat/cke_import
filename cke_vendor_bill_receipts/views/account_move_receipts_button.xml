@@ -31,15 +31,20 @@
                    context="{'tree_view_ref': 'cke_vendor_bill_receipts.view_receipt_move_tree'}">
               <tree string="Picking List" create="false" delete="false" edit="false">
                 <field name="picking_id"/>
-                <field name="date"/>
+                <field name="container_number" string="Container #"/>
+                <field name="date" string="Date Scheduled" widget="date"/>
                 <field name="product_id"/>
-                <field name="product_uom_qty" string="Demand"/>
-                <field name="quantity_done" string="Done"/>
-                <field name="product_uom"/>
-                <field name="state"/>
-                <field name="location_id" string="From"/>
-                <field name="location_dest_id" string="To"/>
-                <field name="reference"/>
+                <field name="product_uom_qty" string="PO Qty"/>
+                <field name="quantity_done" string="CI Done"/>
+                <field name="product_uom" string="UoM"/>
+                <field name="state" string="CI Status"/>
+                <field name="location_id" string="From Location" invisible="1"/>
+                <field name="location_dest_id" string="To Location" invisible="1"/>
+                <field name="stage_badge_html" string="Stage" widget="html"/>
+                <field name="stage_from" string="From Stage" invisible="1"/>
+                <field name="stage_to" string="To Stage" invisible="1"/>
+                <field name="stage_move_date" string="Stage Date" widget="date"/>
+                <field name="po_reference" string="PO"/>
               </tree>
             </field>
           </page>

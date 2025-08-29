@@ -7,7 +7,7 @@
     "author": "aRai + GPT",
     "website": "https://example.com",
     "license": "LGPL-3",
-    "depends": ["account", "stock", "purchase", "product_bundle_pack"],
+    "depends": ["account", "stock", "purchase", "product_bundle_pack", "purchase_advance_payment"],
     "data": [
         "views/account_move_receipts_button.xml",
         "views/receipt_move_tree.xml",
