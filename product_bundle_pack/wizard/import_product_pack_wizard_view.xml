@@ -70,6 +70,7 @@
                                             <tr>
                                                 <th>Kode Unit</th>
                                                 <th>Deskripsi</th>
+                                                <th>Manufacture Code</th>
                                                 <th>Is Pack</th>
                                                 <th>Type</th>
                                                 <th>Category</th>
@@ -78,6 +79,7 @@
                                                 <th>Cal Pack Price</th>
                                                 <th>Kode Part</th>
                                                 <th>Deskripsi Part</th>
+                                                <th>Part Category</th>
                                                 <th>Quantity</th>
                                                 <th>UOM</th>
                                                 <th>Part Cost</th>

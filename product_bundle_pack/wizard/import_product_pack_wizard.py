@@ -181,24 +181,58 @@ class ImportProductPackWizard(models.TransientModel):
             is_pack = self.B(first.get('Is Pack') or True)
             bundle_type = G(first, 'Type') or 'product'
             cal_pack_price = self.B(first.get('Cal Pack Price'))
+            
+            # Get Manufacture Code for PARENT product (Kode Unit)
+            parent_mfg_code = G(first, 'Manufacture Code')
+            parent_factory_model = G(first, 'Factory Model No')
+            parent_brand = G(first, 'Product Brand')
+            parent_category = G(first, 'Category')
 
-            # cari / buat template
+            # Find or create template for parent/bundle
             prod = Product.search([('default_code', '=', bundle_code)], limit=1)
             if prod:
                 tmpl = prod.product_tmpl_id
                 updated_tmpl += 1
             else:
+                # Set category for parent if provided
+                parent_categ_id = False
+                if parent_category:
+                    categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+                    if not categ:
+                        categ = self.env['product.category'].create({'name': parent_category})
+                    parent_categ_id = categ.id
+                
+                # Create template with Manufacture Code for PARENT
                 tmpl = Template.create({
                     'name': bundle_name,
                     'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
                     'is_pack': True,
                     'cal_pack_price': cal_pack_price,
+                    'manufacture_code': parent_mfg_code or False,  # Set manufacture code for parent
+                    'factory_model_no': parent_factory_model or False,  # Set factory model for parent
+                    'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
                 })
                 prod = tmpl.product_variant_id
                 prod.default_code = bundle_code
                 created_tmpl += 1
 
-            # update flags parent
+            # Update parent product attributes if it already exists
+            if prod:
+                update_vals = {}
+                if parent_mfg_code and not tmpl.manufacture_code:
+                    update_vals['manufacture_code'] = parent_mfg_code
+                if parent_factory_model and not tmpl.factory_model_no:
+                    update_vals['factory_model_no'] = parent_factory_model
+                if parent_category:
+                    categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+                    if not categ:
+                        categ = self.env['product.category'].create({'name': parent_category})
+                    if categ and tmpl.categ_id != categ:
+                        update_vals['categ_id'] = categ.id
+                if update_vals:
+                    tmpl.write(update_vals)
+
+            # Update flags parent
             tmpl.is_pack = bool(is_pack)
             if tmpl.cal_pack_price != cal_pack_price:
                 tmpl.cal_pack_price = cal_pack_price
@@ -208,25 +242,27 @@ class ImportProductPackWizard(models.TransientModel):
 
             if not component_rows:
                 if self.allow_parent_only:
-                    # cukup buat/update parent tanpa error
+                    # Just create/update parent without error
                     continue
                 else:
                     raise UserError(_("Bundle %s has no components (no 'Kode Part').") % bundle_code)
 
-            # hapus existing jika Replace All aktif
+            # Delete existing if Replace All is active
             if self.replace_all:
                 tmpl.pack_ids.unlink()
 
-            # mapping existing untuk Update Existing
+            # Mapping existing for Update Existing
             existing_map = {}
             if self.update_existing and not self.replace_all:
                 for pl in tmpl.pack_ids:
                     existing_map[pl.product_id.id] = pl
 
-            # proses komponen
+            # Process components
             for r in component_rows:
                 part_code = G(r, 'Kode Part')
                 part_name = G(r, 'Deskripsi Part') or part_code
+                part_cat_name = G(r, 'Part Category')
+                # Note: We DON'T use Manufacture Code here anymore as it belongs to parent
                 qty = self.F(r.get('Quantity'))
                 uom_name = G(r, 'UOM')
                 cost = self.F(r.get('Part Cost'))
@@ -236,14 +272,35 @@ class ImportProductPackWizard(models.TransientModel):
 
                 comp = Product.search([('default_code', '=', part_code)], limit=1)
                 if not comp:
+                    categ_id = False
+                    if part_cat_name:
+                        categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+                        if not categ:
+                            categ = self.env['product.category'].create({'name': part_cat_name})
+                        categ_id = categ.id
+
+                    # Create component WITHOUT manufacture_code (it belongs to parent)
                     comp_tmpl = Template.create({
                         'name': part_name or part_code,
                         'type': 'product',
+                        'categ_id': categ_id or self.env.ref('product.product_category_all').id,
+                        # NOT setting manufacture_code here - it's for parent only
                     })
+
                     comp = comp_tmpl.product_variant_id
                     comp.default_code = part_code
                     if cost > 0:
                         comp.standard_price = cost
+                else:
+                    # Update attributes if available in file
+                    write_vals = {}
+                    if part_cat_name:
+                        categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+                        if not categ:
+                            categ = self.env['product.category'].create({'name': part_cat_name})
+                        write_vals['categ_id'] = categ.id
+                    if write_vals:
+                        comp.product_tmpl_id.write(write_vals)
 
                 if self.update_existing and comp.id in existing_map:
                     pl = existing_map[comp.id]
@@ -260,7 +317,6 @@ class ImportProductPackWizard(models.TransientModel):
                         'default_code': comp.default_code,
                         'name': comp.name,
                         'standard_price': comp.standard_price if comp.standard_price else cost,
-                        # 'uom_id': get_uom_id(uom_name) or comp.uom_id.id,
                     })
                     created_lines += 1
 

@@ -32,12 +32,35 @@ class ProductPack(models.Model):
     bi_product_template = fields.Many2one('product.template', string='Parent Product')
     bi_image = fields.Binary(related='product_id.image_1920', string='Image', store=True)
     price = fields.Float(related='product_id.lst_price', string='Product Price')
+    po_qty = fields.Float(string='PO Qty', compute='_compute_po_qty', digits='Product Unit of Measure', store=False)
+    total_qty = fields.Float(string='Total Qty', compute='_compute_total_qty', digits='Product Unit of Measure', store=False)
+
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
         self.default_code = self.product_id.default_code
         self.name = self.product_id.name
         self.standard_price = self.product_id.standard_price
+
+    @api.depends_context('po_id')
+    def _compute_po_qty(self):
+        """Jumlah kuantitas PO untuk template bundle yang sama di PO aktif."""
+        PurchaseOrder = self.env['purchase.order']
+        po_id = self.env.context.get('po_id')
+        po = PurchaseOrder.browse(po_id) if po_id else PurchaseOrder.browse()
+        for pack in self:
+            qty = 0.0
+            if po:
+                # Akumulasi semua line PO yang produknya adalah template bundle ini
+                for line in po.order_line:
+                    if line.product_id and line.product_id.product_tmpl_id == pack.bi_product_template:
+                        qty += line.product_qty
+            pack.po_qty = qty
+
+    @api.depends('qty_uom', 'po_qty')
+    def _compute_total_qty(self):
+        for pack in self:
+            pack.total_qty = (pack.qty_uom or 0.0) * (pack.po_qty or 0.0)
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'

@@ -29,9 +29,9 @@ class TemplateDownloadController(http.Controller):
             
             # Headers
             headers = [
-                'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category',
-                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part', 
-                'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
+                'Kode Unit', 'Deskripsi', 'Manufacture Code', 'Is Pack', 'Type', 'Category',
+                'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part',
+                'Deskripsi Part', 'Part Category', 'Quantity', 'UOM', 'Part Cost'
             ]
             
             for col, header in enumerate(headers):
@@ -39,11 +39,14 @@ class TemplateDownloadController(http.Controller):
             
             # Sample data
             sample_data = [
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'MOTOR001', 'Motor 1HP', 1, 'Unit', 1500000],
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'CABLE001', 'Power Cable 5m', 1, 'Unit', 150000],
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'SWITCH001', 'On/Off Switch', 1, 'Unit', 75000],
-                ['BUNDLE002', 'Fan Complete Set', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'FAN001', 'Industrial Fan 16"', 1, 'Unit', 800000],
-                ['BUNDLE002', 'Fan Complete Set', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'STAND001', 'Fan Stand', 1, 'Unit', 200000],
+                #  Kode Unit, Deskripsi, Manufacture Code, Is Pack, Type, Category,
+                #  Factory Model No, Product Brand, Cal Pack Price, Kode Part,
+                #  Deskripsi Part, Part Category, Quantity, UOM, Part Cost
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'MOTOR001', 'Motor 1HP', 'Motor', 1, 'Unit', 1500000],
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'CABLE001', 'Power Cable 5m', 'Cable', 1, 'Unit', 150000],
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'SWITCH001', 'On/Off Switch', 'Switch', 1, 'Unit', 75000],
+                ['BUNDLE002', 'Fan Complete Set', 'MFG-BND-002', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'FAN001', 'Industrial Fan 16\"', 'Fan', 1, 'Unit', 800000],
+                ['BUNDLE002', 'Fan Complete Set', 'MFG-BND-002', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'STAND001', 'Fan Stand', 'Stand', 1, 'Unit', 200000],
             ]
             
             for row, data in enumerate(sample_data, 1):
@@ -85,19 +88,19 @@ class TemplateDownloadController(http.Controller):
             
             # Headers
             headers = [
-                'Kode Unit', 'Deskripsi', 'Is Pack', 'Type', 'Category',
+                'Kode Unit', 'Deskripsi', 'Manufacture Code', 'Is Pack', 'Type', 'Category',
                 'Factory Model No', 'Product Brand', 'Cal Pack Price', 'Kode Part',
-                'Deskripsi Part', 'Quantity', 'UOM', 'Part Cost'
+                'Deskripsi Part', 'Part Category', 'Quantity', 'UOM', 'Part Cost'
             ]
             writer.writerow(headers)
             
             # Sample data
             sample_data = [
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'MOTOR001', 'Motor 1HP', '1', 'Unit', '1500000'],
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'CABLE001', 'Power Cable 5m', '1', 'Unit', '150000'],
-                ['BUNDLE001', 'Motor Package Set', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'SWITCH001', 'On/Off Switch', '1', 'Unit', '75000'],
-                ['BUNDLE002', 'Fan Complete Set', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'FAN001', 'Industrial Fan 16"', '1', 'Unit', '800000'],
-                ['BUNDLE002', 'Fan Complete Set', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'STAND001', 'Fan Stand', '1', 'Unit', '200000'],
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'MOTOR001', 'Motor 1HP', 'Motor', '1', 'Unit', '1500000'],
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'CABLE001', 'Power Cable 5m', 'Cable', '1', 'Unit', '150000'],
+                ['BUNDLE001', 'Motor Package Set', 'MFG-BND-001', 'TRUE', 'product', 'All / Saleable', 'MP-2024-001', 'Industrial Brand', 'TRUE', 'SWITCH001', 'On/Off Switch', 'Switch', '1', 'Unit', '75000'],
+                ['BUNDLE002', 'Fan Complete Set', 'MFG-BND-002', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'FAN001', 'Industrial Fan 16\"', 'Fan', '1', 'Unit', '800000'],
+                ['BUNDLE002', 'Fan Complete Set', 'MFG-BND-002', 'TRUE', 'product', 'All / Saleable', 'FC-2024-002', 'Fan Pro', 'TRUE', 'STAND001', 'Fan Stand', 'Stand', '1', 'Unit', '200000'],
             ]
             
             for data in sample_data:

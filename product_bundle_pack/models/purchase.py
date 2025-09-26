@@ -299,7 +299,8 @@ class PurchaseOrder(models.Model):
             for line in order.order_line:
                 if line.product_id and line.product_id.product_tmpl_id.is_pack:
                     packs |= line.product_id.product_tmpl_id.pack_ids
-            order.pack_line_ids = packs
+            # order.pack_line_ids = packs ## sebelum menghitung pack qty po
+            order.pack_line_ids = packs.with_context(po_id=order.id)
 
     # def action_create_invoice(self):
     #     invoices = self.env['account.move']

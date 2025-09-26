@@ -16,6 +16,8 @@
                                 <field name="name"/>
                                 <field name="qty_uom"/>
                                 <field name="uom_id"/>
+                                <field name="po_qty" string="PO Qty"/>
+                                <field name="total_qty" string="Total Qty"/>
                                 <field name="standard_price"/>
                             </tree>
                         </field>

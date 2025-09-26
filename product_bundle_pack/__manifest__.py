@@ -24,8 +24,8 @@
     "author": "PT Industrial Multi Fan",
     "maintainer": "aRai",
     "website": "https://kipascke.co.id",
-    "version": '14.0.8.25',
-    "depends": ['sale','product','stock','sale_stock','sale_management','purchase'],
+    "version": '14.0.15.09.25',
+    "depends": ['sale','product','stock','sale_stock','sale_management','purchase','cke_product_model'],
     "data": [
         'views/product_view.xml',
         'views/purchase_order_pack_view.xml',
@@ -40,6 +40,9 @@
         'security/ir.model.access.csv',
         'views/product_pack_view.xml',
     ],
+    'external_dependencies': {
+    'python': ['xlsxwriter']
+    },
     "images": ['static/description/icon.png'],
     "installable": True,
     "application": True,
