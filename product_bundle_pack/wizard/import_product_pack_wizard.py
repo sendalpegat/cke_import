@@ -178,7 +178,11 @@ class ImportProductPackWizard(models.TransientModel):
         for bundle_code, bundle_rows in by_bundle.items():
             first = bundle_rows[0]
             bundle_name = G(first, 'Deskripsi') or bundle_code
-            is_pack = self.B(first.get('Is Pack') or True)
+            is_pack_raw = first.get('Is Pack')
+            if is_pack_raw is None or is_pack_raw == '':
+                is_pack = True  # Default TRUE hanya jika kosong
+            else:
+                is_pack = self.B(is_pack_raw)  # Gunakan nilai asli dari file
             bundle_type = G(first, 'Type') or 'product'
             cal_pack_price = self.B(first.get('Cal Pack Price'))
             
@@ -206,11 +210,12 @@ class ImportProductPackWizard(models.TransientModel):
                 tmpl = Template.create({
                     'name': bundle_name,
                     'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
-                    'is_pack': True,
+                    'is_pack': is_pack,
                     'cal_pack_price': cal_pack_price,
                     'manufacture_code': parent_mfg_code or False,  # Set manufacture code for parent
                     'factory_model_no': parent_factory_model or False,  # Set factory model for parent
                     'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
+                    'sale_ok': False,  # <-- HARDCODE: Can Be Sold = FALSE
                 })
                 prod = tmpl.product_variant_id
                 prod.default_code = bundle_code
@@ -229,6 +234,25 @@ class ImportProductPackWizard(models.TransientModel):
                         categ = self.env['product.category'].create({'name': parent_category})
                     if categ and tmpl.categ_id != categ:
                         update_vals['categ_id'] = categ.id
+                if parent_brand:
+                    try:
+                        Brand = self.env['product.brand']
+                        brand = Brand.search([('name', '=', parent_brand)], limit=1)
+                        if not brand:
+                            brand = Brand.create({'name': parent_brand})
+                        
+                        # Cek field brand yang ada dan update jika kosong
+                        brand_fields = ['brand_id', 'product_brand_id', 'x_brand_id', 'brand']
+                        for field_name in brand_fields:
+                            if field_name in Template._fields:
+                                current_brand = getattr(tmpl, field_name, False)
+                                if not current_brand:  # Update hanya jika brand belum ada
+                                    update_vals[field_name] = brand.id
+                                break
+                    except Exception:
+                        # Skip jika model brand tidak ada
+                        pass
+                        
                 if update_vals:
                     tmpl.write(update_vals)
 
