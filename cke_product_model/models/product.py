@@ -8,7 +8,7 @@ class ProductTemplate(models.Model):
         help='Factory model number of the product'
     )
     manufacture_code = fields.Char(
-        string='Manufacture Code',
+        string='Supplier Code',
         help='Manufacturer code for the product'
     )
 
@@ -23,7 +23,7 @@ class ProductProduct(models.Model):
         help='Factory model number of the product'
     )
     manufacture_code = fields.Char(
-        string='Manufacture Code',
+        string='Supplier Code',
         related='product_tmpl_id.manufacture_code',
         readonly=False,
         store=True,
