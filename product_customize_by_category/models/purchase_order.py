@@ -1,49 +1,152 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
-     
-    def write(self, vals):
-        # Jalankan logika penguncian sebelum menyimpan perubahan
-        for order in self:
-            if order.state in ['draft', 'sent']:  # Sesuaikan kondisi sesuai kebutuhan
-                for line in order.order_line:
-                    if line.product_id.product_tmpl_id:
-                        template = line.product_id.product_tmpl_id
-                        variant = line.product_id
-                        template.write({'is_locked': True})
-                        variant.write({'is_locked': True})
-                        template.spec_field_values.write({'is_locked': True})
-                        template.material_field_values.write({'is_locked': True})
-                        template.cable_field_values.write({'is_locked': True})
-                        template.color_field_values.write({'is_locked': True})
-        # Panggil method write() asli untuk menyimpan data
-        return super(PurchaseOrder, self).write(vals)
 
-from odoo import models, fields, api
+    def button_confirm(self):
+        """
+        IMPROVED: Lock fields hanya saat PO confirmed, bukan saat draft
+        Ini lebih reasonable karena draft bisa diubah
+        """
+        res = super(PurchaseOrder, self).button_confirm()
+        
+        # Lock product fields setelah PO confirmed
+        for order in self:
+            try:
+                for line in order.order_line:
+                    if not line.product_id or not line.product_id.product_tmpl_id:
+                        continue
+                    
+                    template = line.product_id.product_tmpl_id
+                    variant = line.product_id
+                    
+                    # IMPROVED: Lock dengan context untuk bypass validations
+                    _logger.info(
+                        "Locking product %s due to PO %s confirmation",
+                        variant.display_name,
+                        order.name
+                    )
+                    
+                    # Lock template dan variant
+                    template.with_context(tracking_disable=True).write({
+                        'is_locked': True
+                    })
+                    variant.with_context(tracking_disable=True).write({
+                        'is_locked': True
+                    })
+                    
+                    # Lock semua field values
+                    template.spec_field_values.with_context(force_unlock=True).write({
+                        'is_locked': True,
+                        'original_value': template.spec_field_values.mapped('value')
+                    })
+                    template.material_field_values.with_context(force_unlock=True).write({
+                        'is_locked': True
+                    })
+                    template.cable_field_values.with_context(force_unlock=True).write({
+                        'is_locked': True
+                    })
+                    template.color_field_values.with_context(force_unlock=True).write({
+                        'is_locked': True
+                    })
+                    
+            except Exception as e:
+                _logger.error(
+                    "Error locking products for PO %s: %s",
+                    order.name,
+                    str(e)
+                )
+                # Don't block PO confirmation jika ada error
+                
+        return res
+
+    def button_cancel(self):
+        """
+        ADDED: Unlock products saat PO dibatalkan
+        """
+        res = super(PurchaseOrder, self).button_cancel()
+        
+        for order in self:
+            for line in order.order_line:
+                if not line.product_id or not line.product_id.product_tmpl_id:
+                    continue
+                
+                template = line.product_id.product_tmpl_id
+                variant = line.product_id
+                
+                _logger.info(
+                    "Unlocking product %s due to PO %s cancellation",
+                    variant.display_name,
+                    order.name
+                )
+                
+                # Unlock dengan context
+                template.with_context(tracking_disable=True).write({
+                    'is_locked': False
+                })
+                variant.with_context(tracking_disable=True).write({
+                    'is_locked': False
+                })
+                
+                # Unlock field values
+                all_field_values = (
+                    template.spec_field_values |
+                    template.material_field_values |
+                    template.cable_field_values |
+                    template.color_field_values
+                )
+                all_field_values.with_context(force_unlock=True).write({
+                    'is_locked': False
+                })
+        
+        return res
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
+    # Custom fields di PO line
     motor_type = fields.Text(string='Motor Type')
     bearing_type = fields.Text(string='Bearing Type')
+    
     knob_switch_speed = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='Knob Switch Speed', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Knob Switch Speed',
+        default='no'
     )
+    
     cable_speed = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='Cable Speed', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Cable Speed',
+        default='no'
     )
+    
     remote_control = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='Remote Control', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Remote Control',
+        default='no'
     )
+    
     tou = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='Therm of Use', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Thermofuse',
+        default='no'
     )
+    
     led = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='LED', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='LED',
+        default='no'
     )
+    
     manual_book = fields.Selection(
-        [('yes', 'Yes'), ('no', 'No')], string='Manual Book', default='no'
+        [('yes', 'Yes'), ('no', 'No')],
+        string='Manual Book',
+        default='no'
     )
 
     categories_template_summary = fields.Char(
@@ -63,29 +166,52 @@ class PurchaseOrderLine(models.Model):
         'manual_book'
     )
     def _compute_categories_template_summary(self):
+        """
+        IMPROVED: Compute summary dengan better formatting
+        """
         for line in self:
             summary = []
+            
+            # Text fields
             if line.motor_type:
-                summary.append("Motor Type: %s" % line.motor_type)
+                summary.append(f"Motor Type: {line.motor_type}")
             if line.bearing_type:
-                summary.append("Bearing Type: %s" % line.bearing_type)
-            if line.knob_switch_speed and line.knob_switch_speed != "no":
-                summary.append("Knob Switch Speed: %s" % dict(line._fields['knob_switch_speed'].selection).get(line.knob_switch_speed))
-            if line.cable_speed and line.cable_speed != "no":
-                summary.append("Cable Speed: %s" % dict(line._fields['cable_speed'].selection).get(line.cable_speed))
-            if line.remote_control and line.remote_control != "no":
-                summary.append("Remote Control: %s" % dict(line._fields['remote_control'].selection).get(line.remote_control))
-            if line.tou and line.tou != "no":
-                summary.append("Therm of Use: %s" % dict(line._fields['tou'].selection).get(line.tou))
-            if line.led and line.led != "no":
-                summary.append("LED: %s" % dict(line._fields['led'].selection).get(line.led))
-            if line.manual_book and line.manual_book != "no":
-                summary.append("Manual Book: %s" % dict(line._fields['manual_book'].selection).get(line.manual_book))
-            line.categories_template_summary = ", ".join(summary)
+                summary.append(f"Bearing Type: {line.bearing_type}")
+            
+            # Selection fields - hanya tampilkan yang 'yes'
+            selection_fields = [
+                ('knob_switch_speed', 'Knob Switch Speed'),
+                ('cable_speed', 'Cable Speed'),
+                ('remote_control', 'Remote Control'),
+                ('tou', 'Thermofuse'),
+                ('led', 'LED'),
+                ('manual_book', 'Manual Book'),
+            ]
+            
+            for field_name, field_label in selection_fields:
+                field_value = getattr(line, field_name)
+                if field_value and field_value != 'no':
+                    # Get human-readable label
+                    selection_dict = dict(
+                        line._fields[field_name].selection
+                    )
+                    summary.append(
+                        f"{field_label}: {selection_dict.get(field_value, field_value)}"
+                    )
+            
+            line.categories_template_summary = ", ".join(summary) if summary else ""
 
     @api.onchange('product_id')
     def _onchange_product_id_sync_custom_fields(self):
+        """
+        IMPROVED: Sync custom fields dari product saat product berubah
+        """
         if self.product_id:
+            _logger.debug(
+                "Syncing custom fields for PO line with product %s",
+                self.product_id.display_name
+            )
+            
             self.motor_type = self.product_id.motor_type
             self.bearing_type = self.product_id.bearing_type
             self.knob_switch_speed = self.product_id.knob_switch_speed
