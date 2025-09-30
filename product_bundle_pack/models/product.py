@@ -25,7 +25,7 @@ class ProductPack(models.Model):
 
     product_id = fields.Many2one('product.product', string='Product', required=True)
     default_code = fields.Char(string="Product Code")
-    name = fields.Char(string="Product Name")
+    name = fields.Char(string="Product Name", related='product_id.name', readonly=True)
     standard_price = fields.Float(string="Cost")
     qty_uom = fields.Float(string='Quantity', required=True, default=1.0)
     uom_id = fields.Many2one(related='product_id.uom_id', string="Unit of Measure", readonly=True)
