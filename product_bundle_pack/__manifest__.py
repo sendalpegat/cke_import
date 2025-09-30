@@ -39,6 +39,7 @@
         'views/simple_import_menu.xml',                      # Minimal menu (cleaned)
         'security/ir.model.access.csv',
         'views/product_pack_view.xml',
+        'views/product_pack_monitoring_view.xml',
     ],
     'external_dependencies': {
     'python': ['xlsxwriter']

@@ -69,6 +69,40 @@ class ProductTemplate(models.Model):
     cal_pack_price = fields.Boolean(string='Calculate Pack Price')
     pack_ids = fields.One2many('product.pack', 'bi_product_template', string='Product Components')
 
+    pack_count = fields.Integer(
+        string='Packs Count',
+        compute='_compute_pack_count',
+        store=True,
+        help='Number of components in this pack'
+    )
+
+    pack_components_display = fields.Text(
+        string='Packs List',
+        compute='_compute_pack_components_display',
+        help='Display list of pack components'
+    )
+
+    @api.depends('pack_ids')
+    def _compute_pack_count(self):
+        """Hitung jumlah komponen dalam pack"""
+        for record in self:
+            record.pack_count = len(record.pack_ids)
+
+    @api.depends('pack_ids', 'pack_ids.product_id', 'pack_ids.qty_uom')
+    def _compute_pack_components_display(self):
+        """Tampilkan list komponen dalam format readable"""
+        for record in self:
+            if not record.pack_ids:
+                record.pack_components_display = '-'
+            else:
+                components = []
+                for pack in record.pack_ids:
+                    component_info = f"{pack.product_id.default_code or pack.product_id.name}"
+                    if pack.qty_uom and pack.qty_uom != 1:
+                        component_info += f" (x{pack.qty_uom})"
+                    components.append(component_info)
+                record.pack_components_display = ", ".join(components)
+
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)

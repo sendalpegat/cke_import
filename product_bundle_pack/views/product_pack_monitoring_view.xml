@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Tree View untuk Product Pack dengan Grouping -->
+        <record id="view_product_template_pack_monitoring_tree" model="ir.ui.view">
+            <field name="name">product.template.pack.monitoring.tree</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <tree string="Product Pack Monitoring" decoration-danger="is_pack and not pack_count" decoration-success="is_pack and pack_count > 0">
+                    <field name="default_code"/>
+                    <field name="name"/>
+                    <field name="uom_id"/>
+                    <field name="categ_id"/>
+                    <field name="is_pack" widget="boolean"/>
+                    <field name="pack_count" string="Packs Count"/>
+                    <field name="cal_pack_price" widget="boolean"/>
+                    <field name="standard_price" widget="monetary"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View untuk Detail Pack -->
+        <record id="view_product_template_pack_monitoring_form" model="ir.ui.view">
+            <field name="name">product.template.pack.monitoring.form</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <form string="Product Pack Details">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Product Name"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="default_code"/>
+                                <field name="categ_id"/>
+                                <field name="is_pack"/>
+                                <field name="pack_count"/>
+                            </group>
+                            <group>
+                                <field name="standard_price" widget="monetary"/>
+                                <field name="cal_pack_price"/>
+                            </group>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Packs" name="components">
+                                <field name="pack_ids">
+                                    <tree>
+                                        <field name="default_code"/>
+                                        <field name="name"/>
+                                        <field name="qty_uom"/>
+                                        <field name="uom_id"/>
+                                        <field name="standard_price"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View dengan Filter dan Grouping -->
+        <record id="view_product_template_pack_monitoring_search" model="ir.ui.view">
+            <field name="name">product.template.pack.monitoring.search</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <search string="Product Pack Monitoring">
+                    <field name="name" string="Product" filter_domain="['|', ('name', 'ilike', self), ('default_code', 'ilike', self)]"/>
+                    <field name="categ_id"/>
+                    <field name="default_code"/>
+                    
+                    <filter string="Is Pack Product" name="is_pack_filter" domain="[('is_pack', '=', True)]"/>
+                    <filter string="Has Packs" name="has_components" domain="[('is_pack', '=', True), ('pack_count', '>', 0)]"/>
+                    <filter string="Missing Packs" name="missing_components" domain="[('is_pack', '=', True), ('pack_count', '=', 0)]"/>
+                    <filter string="Calculate Pack Price" name="cal_pack_price" domain="[('cal_pack_price', '=', True)]"/>
+                    
+                    <separator/>
+                    <filter string="Stockable Product" name="stockable" domain="[('type', '=', 'product')]"/>
+                    <filter string="Consumable" name="consumable" domain="[('type', '=', 'consu')]"/>
+                    <filter string="Service" name="service" domain="[('type', '=', 'service')]"/>
+                    
+                    <group expand="1" string="Group By">
+                        <filter string="Category" name="group_category" context="{'group_by': 'categ_id'}"/>
+                        <filter string="Product Type" name="group_type" context="{'group_by': 'type'}"/>
+                        <filter string="Is Pack" name="group_is_pack" context="{'group_by': 'is_pack'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Kanban View untuk Visual Monitoring -->
+        <record id="view_product_template_pack_monitoring_kanban" model="ir.ui.view">
+            <field name="name">product.template.pack.monitoring.kanban</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="default_code"/>
+                    <field name="is_pack"/>
+                    <field name="pack_count"/>
+                    <field name="categ_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="o_kanban_record_top mb16">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="default_code"/> - <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <span class="float-right badge badge-pill" t-attf-class="badge-#{record.is_pack.raw_value and record.pack_count.raw_value > 0 ? 'success' : record.is_pack.raw_value ? 'danger' : 'secondary'}">
+                                        <t t-if="record.is_pack.raw_value">
+                                            <t t-if="record.pack_count.raw_value > 0">
+                                                <t t-esc="record.pack_count.value"/> Components
+                                            </t>
+                                            <t t-if="record.pack_count.raw_value == 0">
+                                                No Components
+                                            </t>
+                                        </t>
+                                        <t t-if="not record.is_pack.raw_value">
+                                            Not a Pack
+                                        </t>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="categ_id"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="list_price" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Action: Products WITH Pack Components (Configured) -->
+        <record id="action_product_pack_with_components" model="ir.actions.act_window">
+            <field name="name">✓ Products with Components</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,form</field>  <!-- Tambahkan form -->
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('view_product_template_pack_monitoring_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('view_product_template_pack_monitoring_form')})]"/>
+            <field name="domain">[('is_pack', '=', True), ('pack_count', '>', 0)]</field>
+            <field name="context">{'search_default_group_category': 1}</field>
+        </record>
+
+        <!-- Action: Products WITHOUT Pack Components (Need Configuration) -->
+        <record id="action_product_pack_without_components" model="ir.actions.act_window">
+            <field name="name">⚠ Products Missing Packs</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_id" ref="view_product_template_pack_monitoring_tree"/>
+            <field name="search_view_id" ref="view_product_template_pack_monitoring_search"/>
+            <field name="domain">[('is_pack', '=', True), ('pack_count', '=', 0)]</field>
+            <field name="context">{'search_default_group_category': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_list">
+                    Great! All pack products have components configured.
+                </p>
+                <p>
+                    If you see products here, they are marked as "Pack" but have no components yet.
+                </p>
+                <p>
+                    <a name="%(product_bundle_pack.action_import_product_pack_wizard)d" 
+                       type="action" 
+                       class="btn btn-primary">
+                        📥 Import Components
+                    </a>
+                </p>
+            </field>
+        </record>
+
+        <!-- Action: All Pack Products Overview -->
+        <record id="action_product_pack_overview" model="ir.actions.act_window">
+            <field name="name">📦 All Pack Products</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_id" ref="view_product_template_pack_monitoring_tree"/>
+            <field name="search_view_id" ref="view_product_template_pack_monitoring_search"/>
+            <field name="domain">[('is_pack', '=', True)]</field>
+            <field name="context">{'search_default_group_category': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No pack products found yet.
+                </p>
+                <p>
+                    Create a new product and mark it as "Is Product Pack" to get started.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu: Pack Monitoring di bawah Import Tools -->
+        <menuitem id="menu_pack_monitoring_root"
+                  name="📊 Pack Monitoring"
+                  parent="menu_import_tools_main"
+                  sequence="20"/>
+
+        <menuitem id="menu_pack_overview"
+                  name="All Pack Products"
+                  parent="menu_pack_monitoring_root"
+                  action="action_product_pack_overview"
+                  sequence="10"/>
+
+        <menuitem id="menu_pack_with_components"
+                  name="✓ Configured Packs"
+                  parent="menu_pack_monitoring_root"
+                  action="action_product_pack_with_components"
+                  sequence="20"/>
+
+        <menuitem id="menu_pack_without_components"
+                  name="⚠ Missing Packs"
+                  parent="menu_pack_monitoring_root"
+                  action="action_product_pack_without_components"
+                  sequence="30"/>
+
+    </data>
+</odoo>
