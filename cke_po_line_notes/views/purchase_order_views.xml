@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="view_purchase_order_form_simple_notes" model="ir.ui.view">
+        <field name="name">purchase.order.form.simple.notes</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Modifikasi field 'name' di form detail line agar lebih besar -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="attributes">
+                <!-- Ubah ke widget text untuk multiline -->
+                <attribute name="widget">text</attribute>
+                <!-- Tambahkan placeholder yang jelas -->
+                <attribute name="placeholder">Product description and notes...
+You can add:
+- Special requirements
+- Delivery instructions
+- Quality specifications
+- Additional remarks</attribute>
+                <!-- Buat lebih tinggi dengan class -->
+                <attribute name="class">o_field_text</attribute>
+                <!-- Atau set rows untuk tinggi textarea -->
+                <attribute name="options">{'rows': 5}</attribute>
+            </xpath>
+
+            <!-- Optional: Ubah label agar lebih jelas -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="before">
+                <label for="name" string="Description &amp; Notes"/>
+            </xpath>
+            
+            <!-- Optional: Tampilkan kolom description lebih lebar di tree view -->
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="string">Description / Notes</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
