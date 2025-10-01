@@ -239,7 +239,7 @@ class ImportProductPackWizard(models.TransientModel):
         _logger.info(f"File parsed successfully: {len(rows)} rows found")
         
         # ===== BATCH CONFIGURATION =====
-        BATCH_SIZE = 25  # Kurangi ke 20 jika masih error
+        BATCH_SIZE = 15 if len(rows) > 2000 else 25
         
         def G(row, key):
             return self.S(row.get(key))
@@ -284,6 +284,187 @@ class ImportProductPackWizard(models.TransientModel):
         updated_lines = 0
         errors = []
 
+        # # ===== PROCESS IN BATCHES =====
+        # for batch_num in range(total_batches):
+        #     start_idx = batch_num * BATCH_SIZE
+        #     end_idx = min(start_idx + BATCH_SIZE, total_bundles)
+        #     batch = bundle_items[start_idx:end_idx]
+            
+        #     _logger.info(f"Batch {batch_num + 1}/{total_batches}: Processing bundles {start_idx+1} to {end_idx}")
+
+        #     try:
+        #         # Process current batch
+        #         for bundle_code, bundle_rows in batch:
+        #             try:
+        #                 first = bundle_rows[0]
+        #                 bundle_name = G(first, 'Deskripsi') or bundle_code
+        #                 is_pack = self.B(first.get('Is Pack', True))
+        #                 bundle_type = G(first, 'Type') or 'product'
+        #                 cal_pack_price = self.B(first.get('Cal Pack Price'))
+                        
+        #                 parent_mfg_code = G(first, 'Manufacture Code')
+        #                 parent_factory_model = G(first, 'Factory Model No')
+        #                 parent_brand = G(first, 'Product Brand')
+        #                 parent_category = G(first, 'Category')
+
+        #                 # Find or create template
+        #                 prod = Product.search([('default_code', '=', bundle_code)], limit=1)
+        #                 if prod:
+        #                     tmpl = prod.product_tmpl_id
+        #                     updated_tmpl += 1
+        #                 else:
+        #                     parent_categ_id = False
+        #                     if parent_category:
+        #                         categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+        #                         if not categ:
+        #                             categ = self.env['product.category'].create({'name': parent_category})
+        #                         parent_categ_id = categ.id
+
+        #                     parent_brand_id = False
+        #                     if parent_brand:
+        #                         brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+        #                         if not brand:
+        #                             brand = self.env['product.brand'].create({'name': parent_brand})
+        #                         parent_brand_id = brand.id
+                            
+        #                     tmpl = Template.create({
+        #                         'name': bundle_name,
+        #                         'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
+        #                         'is_pack': is_pack,
+        #                         'cal_pack_price': cal_pack_price,
+        #                         'manufacture_code': parent_mfg_code or False,
+        #                         'factory_model_no': parent_factory_model or False,
+        #                         'product_brand_id': parent_brand_id,
+        #                         'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
+        #                         'sale_ok': False,
+        #                     })
+        #                     prod = tmpl.product_variant_id
+        #                     prod.default_code = bundle_code
+        #                     created_tmpl += 1
+
+        #                 # Update parent attributes
+        #                 if prod:
+        #                     update_vals = {}
+        #                     if bundle_name and bundle_name != tmpl.name:
+        #                         update_vals['name'] = bundle_name
+        #                     if parent_mfg_code and parent_mfg_code != tmpl.manufacture_code:
+        #                         update_vals['manufacture_code'] = parent_mfg_code
+        #                     if parent_factory_model and parent_factory_model != tmpl.factory_model_no:
+        #                         update_vals['factory_model_no'] = parent_factory_model
+        #                     if parent_category:
+        #                         categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+        #                         if not categ:
+        #                             categ = self.env['product.category'].create({'name': parent_category})
+        #                         if categ and tmpl.categ_id != categ:
+        #                             update_vals['categ_id'] = categ.id
+        #                     if parent_brand:
+        #                         brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+        #                         if not brand:
+        #                             brand = self.env['product.brand'].create({'name': parent_brand})
+        #                         if brand and tmpl.product_brand_id != brand:
+        #                             update_vals['product_brand_id'] = brand.id
+        #                     if bundle_type and bundle_type in ('product', 'consu', 'service'):
+        #                         if tmpl.type != bundle_type:
+        #                             update_vals['type'] = bundle_type
+        #                     if update_vals:
+        #                         tmpl.write(update_vals)
+
+        #                 tmpl.is_pack = bool(is_pack)
+        #                 if tmpl.cal_pack_price != cal_pack_price:
+        #                     tmpl.cal_pack_price = cal_pack_price
+
+        #                 component_rows = [r for r in bundle_rows if self.S(r.get('Kode Part'))]
+
+        #                 if not component_rows:
+        #                     if self.allow_parent_only:
+        #                         continue
+        #                     else:
+        #                         errors.append(f"Bundle {bundle_code}: No components")
+        #                         continue
+
+        #                 if self.replace_all:
+        #                     tmpl.pack_ids.unlink()
+
+        #                 existing_map = {}
+        #                 if self.update_existing and not self.replace_all:
+        #                     for pl in tmpl.pack_ids:
+        #                         existing_map[pl.product_id.id] = pl
+
+        #                 # Process components
+        #                 for r in component_rows:
+        #                     part_code = G(r, 'Kode Part')
+        #                     part_name = G(r, 'Deskripsi Part') or part_code
+        #                     part_cat_name = G(r, 'Part Category')
+        #                     qty = self.F(r.get('Quantity'))
+        #                     uom_name = G(r, 'UOM')
+        #                     cost = self.F(r.get('Part Cost'))
+
+        #                     if qty <= 0:
+        #                         errors.append(f"Bundle {bundle_code} / Part {part_code}: Invalid quantity")
+        #                         continue
+
+        #                     comp = Product.search([('default_code', '=', part_code)], limit=1)
+        #                     if not comp:
+        #                         categ_id = False
+        #                         if part_cat_name:
+        #                             categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+        #                             if not categ:
+        #                                 categ = self.env['product.category'].create({'name': part_cat_name})
+        #                             categ_id = categ.id
+
+        #                         comp_tmpl = Template.create({
+        #                             'name': part_name or part_code,
+        #                             'type': 'product',
+        #                             'categ_id': categ_id or self.env.ref('product.product_category_all').id,
+        #                         })
+
+        #                         comp = comp_tmpl.product_variant_id
+        #                         comp.default_code = part_code
+        #                         if cost > 0:
+        #                             comp.standard_price = cost
+        #                     else:
+        #                         write_vals = {}
+        #                         if part_cat_name:
+        #                             categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+        #                             if not categ:
+        #                                 categ = self.env['product.category'].create({'name': part_cat_name})
+        #                             write_vals['categ_id'] = categ.id
+        #                         if write_vals:
+        #                             comp.product_tmpl_id.write(write_vals)
+
+        #                     if self.update_existing and comp.id in existing_map:
+        #                         pl = existing_map[comp.id]
+        #                         vals = {'qty_uom': qty}
+        #                         if cost > 0 and not comp.standard_price:
+        #                             vals['standard_price'] = cost
+        #                         pl.write(vals)
+        #                         updated_lines += 1
+        #                     else:
+        #                         Pack.create({
+        #                             'bi_product_template': tmpl.id,
+        #                             'product_id': comp.id,
+        #                             'qty_uom': qty,
+        #                             'default_code': comp.default_code,
+        #                             'name': comp.name,
+        #                             'standard_price': comp.standard_price if comp.standard_price else cost,
+        #                         })
+        #                         created_lines += 1
+
+        #                 tmpl._recompute_pack_price()
+                    
+        #             except Exception as e:
+        #                 errors.append(f"Bundle {bundle_code}: {str(e)}")
+        #                 _logger.error(f"Error processing bundle {bundle_code}: {e}")
+        #                 continue
+
+        #         # ===== COMMIT BATCH =====
+        #         self.env.cr.commit()
+        #         _logger.info(f"Batch {batch_num + 1}/{total_batches} committed successfully")
+                
+        #     except Exception as e:
+        #         _logger.error(f"Fatal error in batch {batch_num + 1}: {e}")
+        #         self.env.cr.rollback()
+        #         raise UserError(_(f"Error in batch {batch_num + 1}: {str(e)}"))
         # ===== PROCESS IN BATCHES =====
         for batch_num in range(total_batches):
             start_idx = batch_num * BATCH_SIZE
@@ -292,7 +473,13 @@ class ImportProductPackWizard(models.TransientModel):
             
             _logger.info(f"Batch {batch_num + 1}/{total_batches}: Processing bundles {start_idx+1} to {end_idx}")
 
+            # SAVEPOINT untuk rollback parsial jika error
+            savepoint_name = f'batch_{batch_num}'
+            
             try:
+                # Buat savepoint sebelum process batch
+                self.env.cr.execute(f"SAVEPOINT {savepoint_name}")
+                
                 # Process current batch
                 for bundle_code, bundle_rows in batch:
                     try:
@@ -320,12 +507,12 @@ class ImportProductPackWizard(models.TransientModel):
                                     categ = self.env['product.category'].create({'name': parent_category})
                                 parent_categ_id = categ.id
 
-                            parent_brand_id = False
-                            if parent_brand:
-                                brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
-                                if not brand:
-                                    brand = self.env['product.brand'].create({'name': parent_brand})
-                                parent_brand_id = brand.id
+                            # parent_brand_id = False
+                            # if parent_brand:
+                            #     brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+                            #     if not brand:
+                            #         brand = self.env['product.brand'].create({'name': parent_brand})
+                            #     parent_brand_id = brand.id
                             
                             tmpl = Template.create({
                                 'name': bundle_name,
@@ -336,7 +523,6 @@ class ImportProductPackWizard(models.TransientModel):
                                 'factory_model_no': parent_factory_model or False,
                                 'product_brand_id': parent_brand_id,
                                 'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
-                                'sale_ok': False,
                             })
                             prod = tmpl.product_variant_id
                             prod.default_code = bundle_code
@@ -347,25 +533,31 @@ class ImportProductPackWizard(models.TransientModel):
                             update_vals = {}
                             if bundle_name and bundle_name != tmpl.name:
                                 update_vals['name'] = bundle_name
+                            
+                            if bundle_type and bundle_type in ('product', 'consu', 'service'):
+                                if tmpl.type != bundle_type:
+                                    update_vals['type'] = bundle_type
+                            
                             if parent_mfg_code and parent_mfg_code != tmpl.manufacture_code:
                                 update_vals['manufacture_code'] = parent_mfg_code
+                            
                             if parent_factory_model and parent_factory_model != tmpl.factory_model_no:
                                 update_vals['factory_model_no'] = parent_factory_model
+                            
                             if parent_category:
                                 categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
                                 if not categ:
                                     categ = self.env['product.category'].create({'name': parent_category})
                                 if categ and tmpl.categ_id != categ:
                                     update_vals['categ_id'] = categ.id
+                            
                             if parent_brand:
                                 brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
                                 if not brand:
                                     brand = self.env['product.brand'].create({'name': parent_brand})
                                 if brand and tmpl.product_brand_id != brand:
                                     update_vals['product_brand_id'] = brand.id
-                            if bundle_type and bundle_type in ('product', 'consu', 'service'):
-                                if tmpl.type != bundle_type:
-                                    update_vals['type'] = bundle_type
+                            
                             if update_vals:
                                 tmpl.write(update_vals)
 
@@ -453,18 +645,26 @@ class ImportProductPackWizard(models.TransientModel):
                         tmpl._recompute_pack_price()
                     
                     except Exception as e:
-                        errors.append(f"Bundle {bundle_code}: {str(e)}")
-                        _logger.error(f"Error processing bundle {bundle_code}: {e}")
+                        error_msg = f"Bundle {bundle_code}: {str(e)}"
+                        errors.append(error_msg)
+                        _logger.error(f"Error processing {error_msg}")
+                        # Rollback ke savepoint dan skip bundle ini
+                        self.env.cr.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+                        self.env.cr.execute(f"SAVEPOINT {savepoint_name}")  # Buat ulang savepoint
                         continue
 
-                # ===== COMMIT BATCH =====
+                # ===== COMMIT BATCH jika sukses =====
+                self.env.cr.execute(f"RELEASE SAVEPOINT {savepoint_name}")
                 self.env.cr.commit()
                 _logger.info(f"Batch {batch_num + 1}/{total_batches} committed successfully")
                 
             except Exception as e:
+                # Error fatal di level batch
                 _logger.error(f"Fatal error in batch {batch_num + 1}: {e}")
-                self.env.cr.rollback()
-                raise UserError(_(f"Error in batch {batch_num + 1}: {str(e)}"))
+                self.env.cr.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+                errors.append(f"Batch {batch_num + 1} failed: {str(e)}")
+                # Continue ke batch berikutnya
+                continue
 
         # ===== RESULT SUMMARY =====
         message = _(
