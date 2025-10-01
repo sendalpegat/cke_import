@@ -507,12 +507,12 @@ class ImportProductPackWizard(models.TransientModel):
                                     categ = self.env['product.category'].create({'name': parent_category})
                                 parent_categ_id = categ.id
 
-                            # parent_brand_id = False
-                            # if parent_brand:
-                            #     brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
-                            #     if not brand:
-                            #         brand = self.env['product.brand'].create({'name': parent_brand})
-                            #     parent_brand_id = brand.id
+                            parent_brand_id = False
+                            if parent_brand:
+                                brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+                                if not brand:
+                                    brand = self.env['product.brand'].create({'name': parent_brand})
+                                parent_brand_id = brand.id
                             
                             tmpl = Template.create({
                                 'name': bundle_name,
@@ -523,6 +523,7 @@ class ImportProductPackWizard(models.TransientModel):
                                 'factory_model_no': parent_factory_model or False,
                                 'product_brand_id': parent_brand_id,
                                 'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
+                                'sale_ok': False,
                             })
                             prod = tmpl.product_variant_id
                             prod.default_code = bundle_code
@@ -531,6 +532,8 @@ class ImportProductPackWizard(models.TransientModel):
                         # Update parent attributes
                         if prod:
                             update_vals = {}
+                            if tmpl.sale_ok:
+                                update_vals['sale_ok'] = False
                             if bundle_name and bundle_name != tmpl.name:
                                 update_vals['name'] = bundle_name
                             
@@ -608,6 +611,7 @@ class ImportProductPackWizard(models.TransientModel):
                                     'name': part_name or part_code,
                                     'type': 'product',
                                     'categ_id': categ_id or self.env.ref('product.product_category_all').id,
+                                    'sale_ok': False,
                                 })
 
                                 comp = comp_tmpl.product_variant_id
