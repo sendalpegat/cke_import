@@ -298,7 +298,7 @@ class ImportProductPackWizard(models.TransientModel):
                     try:
                         first = bundle_rows[0]
                         bundle_name = G(first, 'Deskripsi') or bundle_code
-                        is_pack = self.B(first.get('Is Pack') or True)
+                        is_pack = self.B(first.get('Is Pack', True))
                         bundle_type = G(first, 'Type') or 'product'
                         cal_pack_price = self.B(first.get('Cal Pack Price'))
                         
@@ -319,15 +319,24 @@ class ImportProductPackWizard(models.TransientModel):
                                 if not categ:
                                     categ = self.env['product.category'].create({'name': parent_category})
                                 parent_categ_id = categ.id
+
+                            parent_brand_id = False
+                            if parent_brand:
+                                brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+                                if not brand:
+                                    brand = self.env['product.brand'].create({'name': parent_brand})
+                                parent_brand_id = brand.id
                             
                             tmpl = Template.create({
                                 'name': bundle_name,
                                 'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
-                                'is_pack': True,
+                                'is_pack': is_pack,
                                 'cal_pack_price': cal_pack_price,
                                 'manufacture_code': parent_mfg_code or False,
                                 'factory_model_no': parent_factory_model or False,
+                                'product_brand_id': parent_brand_id,
                                 'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
+                                'sale_ok': False,
                             })
                             prod = tmpl.product_variant_id
                             prod.default_code = bundle_code
@@ -336,9 +345,11 @@ class ImportProductPackWizard(models.TransientModel):
                         # Update parent attributes
                         if prod:
                             update_vals = {}
-                            if parent_mfg_code and not tmpl.manufacture_code:
+                            if bundle_name and bundle_name != tmpl.name:
+                                update_vals['name'] = bundle_name
+                            if parent_mfg_code and parent_mfg_code != tmpl.manufacture_code:
                                 update_vals['manufacture_code'] = parent_mfg_code
-                            if parent_factory_model and not tmpl.factory_model_no:
+                            if parent_factory_model and parent_factory_model != tmpl.factory_model_no:
                                 update_vals['factory_model_no'] = parent_factory_model
                             if parent_category:
                                 categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
@@ -346,6 +357,15 @@ class ImportProductPackWizard(models.TransientModel):
                                     categ = self.env['product.category'].create({'name': parent_category})
                                 if categ and tmpl.categ_id != categ:
                                     update_vals['categ_id'] = categ.id
+                            if parent_brand:
+                                brand = self.env['product.brand'].search([('name', '=', parent_brand)], limit=1)
+                                if not brand:
+                                    brand = self.env['product.brand'].create({'name': parent_brand})
+                                if brand and tmpl.product_brand_id != brand:
+                                    update_vals['product_brand_id'] = brand.id
+                            if bundle_type and bundle_type in ('product', 'consu', 'service'):
+                                if tmpl.type != bundle_type:
+                                    update_vals['type'] = bundle_type
                             if update_vals:
                                 tmpl.write(update_vals)
 

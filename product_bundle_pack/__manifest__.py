@@ -24,7 +24,7 @@
     "author": "PT Industrial Multi Fan",
     "maintainer": "aRai",
     "website": "https://kipascke.co.id",
-    "version": '14.0.15.09.25',
+    "version": '14.0.01.10.25',
     "depends": ['sale','product','stock','sale_stock','sale_management','purchase','cke_product_model'],
     "data": [
         'views/product_view.xml',
