@@ -103,15 +103,16 @@ class ImportProductPackWizard(models.TransientModel):
 
     # --- Utilitas baca file ---
     def _read_rows(self):
-        """Baca rows dari file CSV/XLSX, kembalikan list[dict]."""
+        """Baca rows dari file CSV/XLSX dengan temporary file untuk large files."""
         self.ensure_one()
+        
         if not self.file_data:
             raise UserError(_("No file uploaded."))
-
-        content = base64.b64decode(self.file_data or b'')
+        
+        import tempfile
+        import os
+        
         rows = []
-
-        # Pakai pilihan import_type jika ada; fallback dari ekstensi file_name
         ftype = self.import_type
         if not ftype and self.file_name:
             if self.file_name.lower().endswith('.xlsx'):
@@ -119,34 +120,126 @@ class ImportProductPackWizard(models.TransientModel):
             else:
                 ftype = 'csv'
 
+        # Decode base64 file
+        try:
+            content = base64.b64decode(self.file_data)
+        except Exception as e:
+            raise UserError(_("Failed to decode file: %s") % str(e))
+
+        # ===== XLSX PARSER dengan Temporary File =====
         if ftype == 'xlsx':
             if not openpyxl:
                 raise UserError(_("openpyxl is not installed on the server."))
-            wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True)
-            ws = wb.active
-            header_cells = next(ws.iter_rows(min_row=1, max_row=1))
-            header = [self.S(c.value) for c in header_cells]
-            for r in ws.iter_rows(min_row=2, values_only=True):
-                row = {header[i]: r[i] if i < len(r) else None for i in range(len(header))}
-                rows.append(row)
+            
+            # Buat temporary file
+            temp_file = None
+            try:
+                # Buat temp file dengan suffix .xlsx
+                with tempfile.NamedTemporaryFile(mode='wb', suffix='.xlsx', delete=False) as temp_file:
+                    temp_file.write(content)
+                    temp_path = temp_file.name
+                
+                # Baca dengan openpyxl (read_only=True untuk large files)
+                wb = openpyxl.load_workbook(temp_path, read_only=True, data_only=True)
+                ws = wb.active
+                
+                # Baca header
+                header_row = next(ws.iter_rows(min_row=1, max_row=1))
+                header = [self.S(c.value) for c in header_row]
+                
+                # Baca data rows secara streaming
+                row_count = 0
+                for r in ws.iter_rows(min_row=2, values_only=True):
+                    # Skip empty rows
+                    if not any(r):
+                        continue
+                    row = {header[i]: r[i] if i < len(r) else None for i in range(len(header))}
+                    rows.append(row)
+                    row_count += 1
+                    
+                    # Log progress setiap 100 rows
+                    if row_count % 100 == 0:
+                        import logging
+                        _logger = logging.getLogger(__name__)
+                        _logger.info(f"Parsed {row_count} rows...")
+                
+                wb.close()
+                
+            finally:
+                # Cleanup temporary file
+                if temp_file and os.path.exists(temp_path):
+                    try:
+                        os.unlink(temp_path)
+                    except:
+                        pass
+        
+        # ===== CSV PARSER dengan Temporary File =====
         else:
-            text = content.decode('utf-8-sig', errors='ignore')
-            reader = csv.DictReader(io.StringIO(text))
-            for row in reader:
-                rows.append(row)
-
+            temp_file = None
+            try:
+                # Buat temp file untuk CSV
+                with tempfile.NamedTemporaryFile(mode='wb', suffix='.csv', delete=False) as temp_file:
+                    temp_file.write(content)
+                    temp_path = temp_file.name
+                
+                # Baca CSV secara streaming
+                row_count = 0
+                with open(temp_path, 'r', encoding='utf-8-sig', errors='ignore') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        # Skip empty rows
+                        if not any(row.values()):
+                            continue
+                        rows.append(row)
+                        row_count += 1
+                        
+                        # Log progress setiap 100 rows
+                        if row_count % 100 == 0:
+                            import logging
+                            _logger = logging.getLogger(__name__)
+                            _logger.info(f"Parsed {row_count} rows...")
+            
+            finally:
+                # Cleanup temporary file
+                if temp_file and os.path.exists(temp_path):
+                    try:
+                        os.unlink(temp_path)
+                    except:
+                        pass
+        
         return rows
 
     # --- Import utama (dipanggil tombol di view) ---
-
     def button_import(self):
         self.ensure_one()
-        rows = self._read_rows()
+        
+        # ===== VALIDASI AWAL =====
+        if not self.file_data:
+            raise UserError(_("Please upload a file first."))
+        
+        # ===== BACA FILE SECARA STREAMING =====
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.info("Starting file parsing (streaming mode)...")
+        
+        try:
+            rows = self._read_rows()
+        except MemoryError:
+            raise UserError(_(
+                "File too large to process.\n\n"
+                "Solutions:\n"
+                "1. Split file into smaller chunks (max 300-500 rows per file)\n"
+                "2. Use CSV format instead of Excel\n"
+                "3. Contact system administrator to increase server memory"
+            ))
+        
         if not rows:
-            raise UserError(_("No data rows detected."))
-
-        # ===== TAMBAHKAN BATCH SIZE =====
-        BATCH_SIZE = 50  # Proses 50 bundle sekaligus
+            raise UserError(_("No data rows detected in file."))
+        
+        _logger.info(f"File parsed successfully: {len(rows)} rows found")
+        
+        # ===== BATCH CONFIGURATION =====
+        BATCH_SIZE = 25  # Kurangi ke 20 jika masih error
         
         def G(row, key):
             return self.S(row.get(key))
@@ -172,18 +265,24 @@ class ImportProductPackWizard(models.TransientModel):
         for r in rows:
             bundle_code = G(r, 'Kode Unit') or G(r, 'Kode unit') or G(r, 'kode unit')
             if not bundle_code:
-                raise UserError(_("Missing 'Kode Unit' on a row."))
+                continue  # Skip rows tanpa Kode Unit
             by_bundle.setdefault(bundle_code, []).append(r)
+
+        if not by_bundle:
+            raise UserError(_("No valid bundle data found in file."))
 
         # ===== SPLIT INTO BATCHES =====
         bundle_items = list(by_bundle.items())
         total_bundles = len(bundle_items)
         total_batches = (total_bundles + BATCH_SIZE - 1) // BATCH_SIZE
         
+        _logger.info(f"Processing {total_bundles} bundles in {total_batches} batches")
+        
         created_tmpl = 0
         updated_tmpl = 0
         created_lines = 0
         updated_lines = 0
+        errors = []
 
         # ===== PROCESS IN BATCHES =====
         for batch_num in range(total_batches):
@@ -191,159 +290,181 @@ class ImportProductPackWizard(models.TransientModel):
             end_idx = min(start_idx + BATCH_SIZE, total_bundles)
             batch = bundle_items[start_idx:end_idx]
             
-            # Log progress
-            import logging
-            _logger = logging.getLogger(__name__)
-            _logger.info(f"Processing batch {batch_num + 1}/{total_batches} ({start_idx} to {end_idx} of {total_bundles})")
+            _logger.info(f"Batch {batch_num + 1}/{total_batches}: Processing bundles {start_idx+1} to {end_idx}")
 
-            # Process current batch
-            for bundle_code, bundle_rows in batch:
-                first = bundle_rows[0]
-                bundle_name = G(first, 'Deskripsi') or bundle_code
-                is_pack = self.B(first.get('Is Pack') or True)
-                bundle_type = G(first, 'Type') or 'product'
-                cal_pack_price = self.B(first.get('Cal Pack Price'))
-                
-                parent_mfg_code = G(first, 'Manufacture Code')
-                parent_factory_model = G(first, 'Factory Model No')
-                parent_brand = G(first, 'Product Brand')
-                parent_category = G(first, 'Category')
+            try:
+                # Process current batch
+                for bundle_code, bundle_rows in batch:
+                    try:
+                        first = bundle_rows[0]
+                        bundle_name = G(first, 'Deskripsi') or bundle_code
+                        is_pack = self.B(first.get('Is Pack') or True)
+                        bundle_type = G(first, 'Type') or 'product'
+                        cal_pack_price = self.B(first.get('Cal Pack Price'))
+                        
+                        parent_mfg_code = G(first, 'Manufacture Code')
+                        parent_factory_model = G(first, 'Factory Model No')
+                        parent_brand = G(first, 'Product Brand')
+                        parent_category = G(first, 'Category')
 
-                # Find or create template
-                prod = Product.search([('default_code', '=', bundle_code)], limit=1)
-                if prod:
-                    tmpl = prod.product_tmpl_id
-                    updated_tmpl += 1
-                else:
-                    parent_categ_id = False
-                    if parent_category:
-                        categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
-                        if not categ:
-                            categ = self.env['product.category'].create({'name': parent_category})
-                        parent_categ_id = categ.id
+                        # Find or create template
+                        prod = Product.search([('default_code', '=', bundle_code)], limit=1)
+                        if prod:
+                            tmpl = prod.product_tmpl_id
+                            updated_tmpl += 1
+                        else:
+                            parent_categ_id = False
+                            if parent_category:
+                                categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+                                if not categ:
+                                    categ = self.env['product.category'].create({'name': parent_category})
+                                parent_categ_id = categ.id
+                            
+                            tmpl = Template.create({
+                                'name': bundle_name,
+                                'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
+                                'is_pack': True,
+                                'cal_pack_price': cal_pack_price,
+                                'manufacture_code': parent_mfg_code or False,
+                                'factory_model_no': parent_factory_model or False,
+                                'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
+                            })
+                            prod = tmpl.product_variant_id
+                            prod.default_code = bundle_code
+                            created_tmpl += 1
+
+                        # Update parent attributes
+                        if prod:
+                            update_vals = {}
+                            if parent_mfg_code and not tmpl.manufacture_code:
+                                update_vals['manufacture_code'] = parent_mfg_code
+                            if parent_factory_model and not tmpl.factory_model_no:
+                                update_vals['factory_model_no'] = parent_factory_model
+                            if parent_category:
+                                categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
+                                if not categ:
+                                    categ = self.env['product.category'].create({'name': parent_category})
+                                if categ and tmpl.categ_id != categ:
+                                    update_vals['categ_id'] = categ.id
+                            if update_vals:
+                                tmpl.write(update_vals)
+
+                        tmpl.is_pack = bool(is_pack)
+                        if tmpl.cal_pack_price != cal_pack_price:
+                            tmpl.cal_pack_price = cal_pack_price
+
+                        component_rows = [r for r in bundle_rows if self.S(r.get('Kode Part'))]
+
+                        if not component_rows:
+                            if self.allow_parent_only:
+                                continue
+                            else:
+                                errors.append(f"Bundle {bundle_code}: No components")
+                                continue
+
+                        if self.replace_all:
+                            tmpl.pack_ids.unlink()
+
+                        existing_map = {}
+                        if self.update_existing and not self.replace_all:
+                            for pl in tmpl.pack_ids:
+                                existing_map[pl.product_id.id] = pl
+
+                        # Process components
+                        for r in component_rows:
+                            part_code = G(r, 'Kode Part')
+                            part_name = G(r, 'Deskripsi Part') or part_code
+                            part_cat_name = G(r, 'Part Category')
+                            qty = self.F(r.get('Quantity'))
+                            uom_name = G(r, 'UOM')
+                            cost = self.F(r.get('Part Cost'))
+
+                            if qty <= 0:
+                                errors.append(f"Bundle {bundle_code} / Part {part_code}: Invalid quantity")
+                                continue
+
+                            comp = Product.search([('default_code', '=', part_code)], limit=1)
+                            if not comp:
+                                categ_id = False
+                                if part_cat_name:
+                                    categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+                                    if not categ:
+                                        categ = self.env['product.category'].create({'name': part_cat_name})
+                                    categ_id = categ.id
+
+                                comp_tmpl = Template.create({
+                                    'name': part_name or part_code,
+                                    'type': 'product',
+                                    'categ_id': categ_id or self.env.ref('product.product_category_all').id,
+                                })
+
+                                comp = comp_tmpl.product_variant_id
+                                comp.default_code = part_code
+                                if cost > 0:
+                                    comp.standard_price = cost
+                            else:
+                                write_vals = {}
+                                if part_cat_name:
+                                    categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
+                                    if not categ:
+                                        categ = self.env['product.category'].create({'name': part_cat_name})
+                                    write_vals['categ_id'] = categ.id
+                                if write_vals:
+                                    comp.product_tmpl_id.write(write_vals)
+
+                            if self.update_existing and comp.id in existing_map:
+                                pl = existing_map[comp.id]
+                                vals = {'qty_uom': qty}
+                                if cost > 0 and not comp.standard_price:
+                                    vals['standard_price'] = cost
+                                pl.write(vals)
+                                updated_lines += 1
+                            else:
+                                Pack.create({
+                                    'bi_product_template': tmpl.id,
+                                    'product_id': comp.id,
+                                    'qty_uom': qty,
+                                    'default_code': comp.default_code,
+                                    'name': comp.name,
+                                    'standard_price': comp.standard_price if comp.standard_price else cost,
+                                })
+                                created_lines += 1
+
+                        tmpl._recompute_pack_price()
                     
-                    tmpl = Template.create({
-                        'name': bundle_name,
-                        'type': bundle_type if bundle_type in ('product', 'consu', 'service') else 'product',
-                        'is_pack': True,
-                        'cal_pack_price': cal_pack_price,
-                        'manufacture_code': parent_mfg_code or False,
-                        'factory_model_no': parent_factory_model or False,
-                        'categ_id': parent_categ_id or self.env.ref('product.product_category_all').id,
-                    })
-                    prod = tmpl.product_variant_id
-                    prod.default_code = bundle_code
-                    created_tmpl += 1
-
-                # Update parent attributes
-                if prod:
-                    update_vals = {}
-                    if parent_mfg_code and not tmpl.manufacture_code:
-                        update_vals['manufacture_code'] = parent_mfg_code
-                    if parent_factory_model and not tmpl.factory_model_no:
-                        update_vals['factory_model_no'] = parent_factory_model
-                    if parent_category:
-                        categ = self.env['product.category'].search([('name', '=', parent_category)], limit=1)
-                        if not categ:
-                            categ = self.env['product.category'].create({'name': parent_category})
-                        if categ and tmpl.categ_id != categ:
-                            update_vals['categ_id'] = categ.id
-                    if update_vals:
-                        tmpl.write(update_vals)
-
-                tmpl.is_pack = bool(is_pack)
-                if tmpl.cal_pack_price != cal_pack_price:
-                    tmpl.cal_pack_price = cal_pack_price
-
-                component_rows = [r for r in bundle_rows if self.S(r.get('Kode Part'))]
-
-                if not component_rows:
-                    if self.allow_parent_only:
+                    except Exception as e:
+                        errors.append(f"Bundle {bundle_code}: {str(e)}")
+                        _logger.error(f"Error processing bundle {bundle_code}: {e}")
                         continue
-                    else:
-                        raise UserError(_("Bundle %s has no components (no 'Kode Part').") % bundle_code)
 
-                if self.replace_all:
-                    tmpl.pack_ids.unlink()
+                # ===== COMMIT BATCH =====
+                self.env.cr.commit()
+                _logger.info(f"Batch {batch_num + 1}/{total_batches} committed successfully")
+                
+            except Exception as e:
+                _logger.error(f"Fatal error in batch {batch_num + 1}: {e}")
+                self.env.cr.rollback()
+                raise UserError(_(f"Error in batch {batch_num + 1}: {str(e)}"))
 
-                existing_map = {}
-                if self.update_existing and not self.replace_all:
-                    for pl in tmpl.pack_ids:
-                        existing_map[pl.product_id.id] = pl
-
-                # Process components
-                for r in component_rows:
-                    part_code = G(r, 'Kode Part')
-                    part_name = G(r, 'Deskripsi Part') or part_code
-                    part_cat_name = G(r, 'Part Category')
-                    qty = self.F(r.get('Quantity'))
-                    uom_name = G(r, 'UOM')
-                    cost = self.F(r.get('Part Cost'))
-
-                    if qty <= 0:
-                        raise UserError(_("Bundle %s / Part %s has non-positive Quantity.") % (bundle_code, part_code))
-
-                    comp = Product.search([('default_code', '=', part_code)], limit=1)
-                    if not comp:
-                        categ_id = False
-                        if part_cat_name:
-                            categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
-                            if not categ:
-                                categ = self.env['product.category'].create({'name': part_cat_name})
-                            categ_id = categ.id
-
-                        comp_tmpl = Template.create({
-                            'name': part_name or part_code,
-                            'type': 'product',
-                            'categ_id': categ_id or self.env.ref('product.product_category_all').id,
-                        })
-
-                        comp = comp_tmpl.product_variant_id
-                        comp.default_code = part_code
-                        if cost > 0:
-                            comp.standard_price = cost
-                    else:
-                        write_vals = {}
-                        if part_cat_name:
-                            categ = self.env['product.category'].search([('name', '=', part_cat_name)], limit=1)
-                            if not categ:
-                                categ = self.env['product.category'].create({'name': part_cat_name})
-                            write_vals['categ_id'] = categ.id
-                        if write_vals:
-                            comp.product_tmpl_id.write(write_vals)
-
-                    if self.update_existing and comp.id in existing_map:
-                        pl = existing_map[comp.id]
-                        vals = {'qty_uom': qty}
-                        if cost > 0 and not comp.standard_price:
-                            vals['standard_price'] = cost
-                        pl.write(vals)
-                        updated_lines += 1
-                    else:
-                        Pack.create({
-                            'bi_product_template': tmpl.id,
-                            'product_id': comp.id,
-                            'qty_uom': qty,
-                            'default_code': comp.default_code,
-                            'name': comp.name,
-                            'standard_price': comp.standard_price if comp.standard_price else cost,
-                        })
-                        created_lines += 1
-
-                tmpl._recompute_pack_price()
-
-            # ===== COMMIT AFTER EACH BATCH =====
-            self.env.cr.commit()
-            _logger.info(f"Batch {batch_num + 1} committed successfully")
-
+        # ===== RESULT SUMMARY =====
+        message = _(
+            'Import completed!\n\n'
+            'Templates created: %s\n'
+            'Templates updated: %s\n'
+            'Components created: %s\n'
+            'Components updated: %s'
+        ) % (created_tmpl, updated_tmpl, created_lines, updated_lines)
+        
+        if errors:
+            message += _('\n\nWarnings (%s):\n%s') % (len(errors), '\n'.join(errors[:10]))
+        
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Import Product Pack'),
-                'message': _('Done. Template (new/updated): %s/%s | Lines (new/updated): %s/%s') %
-                           (created_tmpl, updated_tmpl, created_lines, updated_lines),
-                'sticky': False,
-                'type': 'success',
+                'message': message,
+                'sticky': True,
+                'type': 'success' if not errors else 'warning',
             }
         }
