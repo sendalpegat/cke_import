@@ -40,9 +40,10 @@ class PurchaseOrder(models.Model):
                     })
                     
                     # Lock semua field values
-                    template.spec_field_values.with_context(force_unlock=True).write({
+                for field_value in template.spec_field_values:
+                    field_value.with_context(force_unlock=True).write({
                         'is_locked': True,
-                        'original_value': template.spec_field_values.mapped('value')
+                        'original_value': field_value.value
                     })
                     template.material_field_values.with_context(force_unlock=True).write({
                         'is_locked': True

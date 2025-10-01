@@ -8,6 +8,10 @@
                 <page string="Categories Template">
                     <group>
                         <button name="action_sync_variant_fields" type="object" string="Sync Variants" class="oe_highlight"/>
+                        <button name="action_unlock_fields" type="object" 
+                                string="Unlock All Fields" 
+                                class="oe_highlight"
+                                attrs="{'invisible': [('is_locked', '=', False)]}"/>
                         <field name="spec_field_values">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
@@ -17,6 +21,8 @@
                                 <field name="is_locked" invisible="1"/>
                             </tree>
                         </field>
+
+
 
                         <field name="spec_field_summary" readonly="1"/>
                         <field name="motor_type"/>

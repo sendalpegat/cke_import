@@ -329,6 +329,35 @@ class ProductTemplate(models.Model):
             }
         }
 
+    def action_unlock_fields(self):
+        """
+        Action to unlock all custom fields
+        """
+        for template in self:
+            template.write({'is_locked': False})
+            
+            # Unlock all field values
+            all_field_values = (
+                template.spec_field_values |
+                template.material_field_values |
+                template.cable_field_values |
+                template.color_field_values
+            )
+            all_field_values.with_context(force_unlock=True).write({
+                'is_locked': False
+            })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Fields Unlocked',
+                'message': 'All custom fields have been unlocked.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
 
 class ProductTemplateFieldValue(models.Model):
     _name = 'product.template.field.value'
