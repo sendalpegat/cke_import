@@ -1,103 +1,114 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+import logging
+_logger = logging.getLogger(__name__)
 
 class ExplodePackWizard(models.TransientModel):
-    _name = 'explode.pack.wizard'
-    _description = 'Explode Product Pack to Components'
+    _inherit = "explode.pack.wizard"  # <<< GANTI sesuai model wizard Anda
 
-    move_id = fields.Many2one('account.move', string="Vendor Bill", required=True)
-    line_ids = fields.One2many('explode.pack.line', 'wizard_id', string="Pack Lines")
+    move_id = fields.Many2one("account.move", string="Vendor Bill", readonly=True)
+    line_ids = fields.One2many("explode.pack.line", "wizard_id", string="Lines")  # ADJUST IF DIFFERENT
 
-    @api.model
-    def default_get(self, fields_list):
-        res = super().default_get(fields_list)
-        active_id = self.env.context.get('active_id')
-        move = self.env['account.move'].browse(active_id)
-        if not move or move.move_type != 'in_invoice':
-            raise UserError(_("This wizard only works with Vendor Bills."))
+    # --------- Helpers ----------
+    def _match_po_line_by_product(self, po, product):
+        """Cari 1 PO line yang product_id = product pada PO tersebut."""
+        if not po or not product:
+            return False
+        return po.order_line.filtered(lambda l: l.product_id.id == product.id)[:1] or False
 
-        # Hindari menduplikasi komponen yang sudah ada di invoice
-        exploded_product_ids = move.invoice_line_ids.mapped('product_id').ids
-        pack_lines = []
-        for line in move.invoice_line_ids:
-            product = line.product_id
-            if product and product.product_tmpl_id.is_pack:
-                for pack in product.product_tmpl_id.pack_ids:
-                    if pack.product_id.id not in exploded_product_ids:
-                        account_id = line.account_id.id or \
-                            pack.product_id.property_account_expense_id.id or \
-                            pack.product_id.categ_id.property_account_expense_categ_id.id
-                        if not account_id:
-                            raise UserError(_("Missing expense account for product %s.") % pack.product_id.display_name)
+    def _ensure_move_vendor_bill(self):
+        for wiz in self:
+            if not wiz.move_id or wiz.move_id.move_type not in ("in_invoice", "in_refund"):
+                raise UserError(_("Wizard ini hanya untuk Vendor Bill (in_invoice/in_refund)."))
 
-                        pack_lines.append((0, 0, {
-                            'product_id': pack.product_id.id,
-                            'qty_uom': pack.qty_uom * line.quantity,
-                            'price_unit': pack.product_id.standard_price,
-                            'account_id': account_id,
-                            'description': "%s (from %s)" % (pack.product_id.name, product.name),
-                            'selected': True,
-                        }))
-
-        res.update({
-            'move_id': active_id,
-            'line_ids': pack_lines,
-        })
-        return res
-
+    # --------- Core ----------
     def button_confirm(self):
+        """
+        Perbaikan utama link ke PO:
+        - Untuk SETIAP baris PACK asal (src), simpan purchase_line_id (po_line_asal).
+        - Buat komponen dari src dgn purchase_line_id = po_line_asal (per-line, bukan global).
+        - Jika move.purchase_id kosong, set dari po_line_asal.order_id.
+        - Fallback: jika po_line_asal kosong -> cari PO line berdasarkan produk di move.purchase_id.
+        - Unlink baris PACK asal di akhir tiap iterasi.
+        """
         self.ensure_one()
+        self._ensure_move_vendor_bill()
         move = self.move_id
-        if move.move_type != 'in_invoice':
-            raise UserError(_("This wizard only works with Vendor Bills."))
 
-        # 1) Kumpulkan semua baris PACK asal (sebelum dihapus)
-        src_pack_lines = move.invoice_line_ids.filtered(
-            lambda l: l.product_id and l.product_id.product_tmpl_id.is_pack
+        # Ambil SEMUA baris PACK asal di bill ini
+        pack_src_lines = move.invoice_line_ids.filtered(
+            lambda l: l.product_id and getattr(l.product_id.product_tmpl_id, "is_pack", False)
         )
-        if not src_pack_lines:
-            # Tidak ada baris PACK di bill ini
+        if not pack_src_lines:
+            # Tidak ada yang perlu diexplode
             return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'account.move',
-                'res_id': move.id,
-                'view_mode': 'form',
-                'target': 'current',
+                "type": "ir.actions.act_window",
+                "res_model": "account.move",
+                "res_id": move.id,
+                "view_mode": "form",
+                "target": "current",
             }
 
-        # 2) Ambil satu purchase_line_id rujukan dari pack asal (cukup 1 supaya PO→Bill terhitung)
-        #    Jika ada banyak pack dari PO yang sama, ini aman.
-        po_line_ref = src_pack_lines.mapped('purchase_line_id')[:1]
-        po_line_ref = po_line_ref and po_line_ref[0] or False
+        # Jika bill belum punya purchase_id, kita akan coba set dari line pertama yang punya po_line
+        po_set = False
 
-        # 3) Jika move belum punya purchase_id tapi kita punya po_line_ref, set supaya relasi PO↔Bill kuat
-        if not move.purchase_id and po_line_ref:
-            move.purchase_id = po_line_ref.order_id
+        # --- LOOP per sumber pack line (agar link PO tetap sesuai sumbernya) ---
+        for src in pack_src_lines:
+            po_line_asal = src.purchase_line_id  # bisa False kalau awalnya tidak dibuat dari PO
+            if po_line_asal and not move.purchase_id and not po_set:
+                move.purchase_id = po_line_asal.order_id
+                po_set = True
 
-        order_ref = move.purchase_id.name if move.purchase_id else False
+            # Siapkan ref nama PO untuk mem-percantik kolom 'name'
+            order_ref = move.purchase_id.name if move.purchase_id else False
 
-        # 4) Hapus pack asal
-        #    (PENTING: dilakukan setelah kita simpan po_line_ref)
-        src_pack_lines.unlink()
+            # Ambil baris komponen yang dipilih di wizard (kalau wizard Anda memang pakai baris)
+            # Jika wizard Anda tidak punya relasi ke 'src', kita pakai seluruh line_ids yang selected.
+            # ADJUST IF DIFFERENT: sesuaikan cara memilih komponen untuk 'src' tertentu.
+            selected_lines = self.line_ids.filtered(lambda l: getattr(l, "selected", True))
 
-        # 5) Tambahkan komponen baru + wariskan purchase_line_id agar statinfo PO muncul
-        for line in self.line_ids.filtered(lambda l: l.selected):
-            self.env['account.move.line'].create({
-                'move_id': move.id,
-                'product_id': line.product_id.id,
-                'quantity': line.qty_uom,
-                'price_unit': line.price_unit,
-                'account_id': line.account_id.id,
-                'name': ("[%s] %s" % (order_ref, line.description)) if order_ref else line.description,
-                'purchase_line_id': po_line_ref.id if po_line_ref else False,  # <<< kunci statinfo
-                'is_exploded_component': True,
-            })
+            # --- Buat komponen untuk SRC ini ---
+            for wline in selected_lines:
+                product = wline.product_id
+                qty = getattr(wline, "qty_uom", False) or getattr(wline, "quantity", 1.0)  # ADJUST IF DIFFERENT
+                price_unit = getattr(wline, "price_unit", 0.0)
+                account_id = getattr(wline, "account_id", False) and wline.account_id.id or False
+                description = getattr(wline, "description", False) or getattr(wline, "name", "")  # ADJUST IF DIFFERENT
+
+                # Tentukan PO line target:
+                # 1) Pakai po_line_asal jika ada
+                # 2) Kalau tidak ada, fallback cari berdasarkan product di move.purchase_id
+                po_line_target = po_line_asal
+                if not po_line_target and move.purchase_id:
+                    po_line_target = self._match_po_line_by_product(move.purchase_id, product)
+                    if not po_line_target:
+                        _logger.warning(
+                            "Tidak menemukan PO line untuk product %s pada PO %s saat explode; komponen tetap dibuat tanpa purchase_line_id.",
+                            product.display_name, move.purchase_id.name
+                        )
+
+                name_val = "[%s] %s" % (order_ref, description) if order_ref else description
+
+                self.env["account.move.line"].create({
+                    "move_id": move.id,
+                    "product_id": product.id,
+                    "quantity": qty,
+                    "price_unit": price_unit,
+                    "account_id": account_id,
+                    "name": name_val,
+                    # KUNCI: linkkan ke PO line yang tepat
+                    "purchase_line_id": po_line_target.id if po_line_target else False,
+                    "is_exploded_component": True,
+                })
+
+            # Hapus baris pack asal (setelah komponen untuk SRC ini dibuat)
+            src.unlink()
 
         return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.move',
-            'res_id': move.id,
-            'view_mode': 'form',
-            'target': 'current',
+            "type": "ir.actions.act_window",
+            "res_model": "account.move",
+            "res_id": move.id,
+            "view_mode": "form",
+            "target": "current",
         }

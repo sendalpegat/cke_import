@@ -18,6 +18,6 @@
         "security/ir.model.access.csv",
         "views/account_move_logistic_views.xml",
     ],
-    "installable": True,
+    "installable": False,
     "application": False,
 }

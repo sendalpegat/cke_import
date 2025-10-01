@@ -25,7 +25,7 @@ class AccountMove(models.Model):
 
     container_number = fields.Char(
         string='Container Number',
-        required=True,
+        required=False,
         help="Required field to indicate the container number."
     )
 
