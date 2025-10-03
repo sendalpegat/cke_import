@@ -18,6 +18,7 @@ class PurchaseOrder(models.Model):
             ('cswtm', 'Complete Set Without Motor'),
             ('sp', 'SKD Packing'),
             ('cs', 'Complete Set'),
+            ('sp', 'Spare Part'),
             ],
         string='Packing Methods',
     )
